@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Creation — Gallery & Hero Slideshow</title>
+
+<style>
+    :root{
+        --accent: #ff9a76;
+        --dark-bg: #1a1200;
+        --card-bg: #2a1f08;
+        --light-text: #f5f5f5;
+        --gray-text: #cfc7bf;
+        --radius: 10px;
+    }
+
+    /* Reset + base */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+        font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        background:var(--dark-bg);
+        color:var(--light-text);
+        -webkit-font-smoothing:antialiased;
+        -moz-osx-font-smoothing:grayscale;
+        line-height:1.45;
+    }
+
+    a{color:inherit;text-decoration:none}
+
+    /* Header */
+    header{
+        position:fixed;
+        top:0;
+        left:0;
+        right:0;
+        height:70px;
+        background: rgba(26,18,0,0.92);
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        padding:0 20px;
+        z-index:2000;
+        box-shadow:0 2px 8px rgba(0,0,0,0.4);
+    }
+    .logo{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--light-text)}
+    .logo .dot{width:10px;height:10px;background:var(--accent);border-radius:50%}
+    nav.nav{display:flex;gap:18px;align-items:center}
+    nav.nav a{color:var(--light-text);opacity:0.9;padding:8px 10px;border-radius:8px}
+    nav.nav a:hover{background:rgba(255,255,255,0.03)}
+
+    /* Hero */
+    .hero{
+        height:82vh;
+        min-height:520px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:0 20px;
+        position:relative;
+        overflow:hidden;
+        margin-top:70px; /* for fixed header */
+    }
+    /* we use pseudo element slideshow layers for smooth fade */
+    .hero .slide{
+        position:absolute;
+        inset:0;
+        background-position:center;
+        background-size:cover;
+        background-repeat:no-repeat;
+        opacity:0;
+        transform:scale(1.02);
+        transition:opacity 1s ease, transform 8s ease;
+    }
+    .hero .slide.show{
+        opacity:1;
+        transform:scale(1);
+    }
+    .hero::after{
+        content:"";
+        position:absolute;
+        inset:0;
+        background:linear-gradient(180deg, rgba(26,18,0,0.45), rgba(26,18,0,0.75));
+        pointer-events:none;
+    }
+
+    .hero-content{
+        position:relative;
+        z-index:10;
+        text-align:center;
+        max-width:1000px;
+        padding:40px;
+        color:var(--light-text);
+    }
+    .hero h1{font-size:clamp(28px,5vw,56px);line-height:1.02;margin-bottom:12px}
+    .hero p{color:var(--gray-text);font-size:clamp(14px,1.5vw,18px);margin-bottom:18px}
+
+    .hero .cta{
+        display:inline-flex;
+        gap:12px;
+        flex-wrap:wrap;
+        justify-content:center;
+    }
+    .btn{
+        display:inline-block;
+        padding:12px 22px;
+        border-radius:999px;
+        font-weight:700;
+        cursor:pointer;
+        border:none;
+    }
+    .btn-primary{background:var(--accent);color:var(--dark-bg);box-shadow:0 6px 20px rgba(255,154,118,0.12)}
+    .btn-outline{background:transparent;border:2px solid rgba(255,255,255,0.06);color:var(--light-text)}
+
+    /* Gallery */
+    .section{
+        padding:60px 20px;
+        max-width:1200px;
+        margin:0 auto;
+    }
+    .section-title{text-align:center;margin-bottom:30px}
+    .section-title h2{font-size:28px;margin-bottom:8px}
+    .grid{
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+        gap:22px;
+    }
+
+    .card{
+        background:var(--card-bg);
+        border-radius:var(--radius);
+        overflow:hidden;
+        transition:transform .28s ease, box-shadow .28s ease;
+        box-shadow:0 6px 18px rgba(0,0,0,0.35);
+    }
+    .card:hover{transform:translateY(-8px);box-shadow:0 18px 40px rgba(0,0,0,0.5)}
+    .card img{display:block;width:100%;height:220px;object-fit:cover}
+    .card .meta{padding:14px 16px}
+    .card .meta h3{color:var(--accent);margin-bottom:6px;font-size:16px}
+    .card .meta p{color:var(--gray-text);font-size:14px}
+
+    /* Back button center */
+    .center{display:flex;justify-content:center;margin-top:30px}
+
+    /* Lightbox */
+    .lightbox{
+        position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+        background:rgba(0,0,0,0.86);z-index:5000;padding:20px;
+    }
+    .lightbox.show{display:flex}
+    .lightbox img{max-width:95%;max-height:88vh;border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,0.7)}
+    .close, .prev, .next{
+        position:fixed;color:white;font-size:28px;background:transparent;border:none;cursor:pointer;
+        z-index:5100;
+        padding:10px 14px;border-radius:8px;
+    }
+    .close{right:26px;top:22px;font-size:32px}
+    .prev{left:26px;top:50%;transform:translateY(-50%);font-size:36px}
+    .next{right:26px;top:50%;transform:translateY(-50%);font-size:36px}
+    .control:hover{color:var(--accent)}
+
+    /* small screen tweaks */
+    @media (max-width:640px){
+        .hero{height:60vh;min-height:420px}
+        .card img{height:160px}
+        .prev,.next{display:none}
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo">            <img src="logo.png"  style="height:40px; width:40px; border-radius:50px;">
+            Creation</div>
+    <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="#gallery" class="active">Gallery</a>
+        <a href="#">Contact</a>
+    </nav>
+</header>
+
+<!-- HERO with Slideshow -->
+<section class="hero" id="hero" aria-label="Hero slideshow">
+    <!-- slides (JS will toggle .show) -->
+    <div class="slide" data-src="IMG-20251126-WA0034.jpg"></div>
+    <div class="slide" data-src="IMG-20251126-WA0028.jpg"></div>
+    <div class="slide" data-src="IMG_20230428_230742.jpg"></div>
+    <div class="slide" data-src=""></div>
+
+    <div class="hero-content">
+        <h1>Transform Your Vision Into Art</h1>
+        <p>Commission bespoke paintings and explore our curated gallery — handcrafted pieces made with passion.</p>
+
+        <div class="cta">
+            <button class="btn btn-primary" onclick="document.getElementById('gallery').scrollIntoView({behavior:'smooth'})">Browse Gallery</button>
+            <button class="btn btn-outline" onclick="document.getElementById('upload').scrollIntoView({behavior:'smooth'})">Order Now</button>
+        </div>
+    </div>
+</section>
+
+<!-- Gallery -->
+<section class="section" id="gallery">
+    <div class="section-title">
+        <h2>Featured Gallery</h2>
+        <p style="color:var(--gray-text); max-width:780px; margin:6px auto 0;">
+            Click any image to view a larger preview. Use arrows or keyboard ← → to navigate.
+        </p>
+    </div>
+
+    <div class="grid" id="gallery-grid">
+        <!-- Cards (you can add/remove) -->
+        <article class="card">
+            <img src="/image/IMG-20251126-WA0028.jpg" src="image/IMG-20251126-WA0028.jpg" alt="Mountain Serenity">
+            <div class="meta">
+                <h3>Mountain Serenity</h3>
+                <p>Landscape • Starting from ₹200</p>
+            </div>
+        </article>
+
+        <article class="card">
+            <img src="IMG-20251126-WA0028.jpg" alt="Classical Elegance">
+            <div class="meta">
+                <h3>Classical Elegance</h3>
+                <p>Portrait • Starting from ₹350</p>
+            </div>
+        </article>
+
+        <article class="card">
+            <img src="IMG_20230428_230742.jpg" alt="Urban Dreams">
+            <div class="meta">
+                <h3>Urban Dreams</h3>
+                <p>Abstract • Starting from ₹280</p>
+            </div>
+        </article>
+
+        <article class="card">
+            <img src="" alt="Oceanic Harmony">
+            <div class="meta">
+                <h3>Oceanic Harmony</h3>
+                <p>Seascape • Starting from ₹320</p>
+            </div>
+        </article>
+
+        <!-- Example additional repeats (you can remove or change filenames) -->
+        <article class="card">
+            <img src="IMG-20251126-WA0028.jpg" alt="Repeat Example">
+            <div class="meta">
+                <h3>Studio Study</h3>
+                <p>Mixed Media • From ₹250</p>
+            </div>
+        </article>
+
+        <article class="card">
+            <img src="IMG_20230428_230742.jpg" alt="Repeat Example 2">
+            <div class="meta">
+                <h3>Color Field</h3>
+                <p>Abstract • From ₹300</p>
+            </div>
+        </article>
+    </div>
+
+    <div class="center">
+        <button class="btn btn-outline" onclick="loadMore()">Load More</button>
+    </div>
+</section>
+
+<!-- Hidden upload/order anchor (target of order buttons) -->
+<section id="upload" style="padding:40px 20px; text-align:center;">
+    <h3 style="color:var(--accent);margin-bottom:8px">Order a Custom Painting</h3>
+    <p style="color:var(--gray-text);max-width:700px;margin:0 auto 16px">
+        Fill the order form on your main site or contact via WhatsApp — we'll reply within 24 hours.
+    </p>
+    <a class="btn btn-primary" href="index.html" style="margin-top:12px">Email Us</a>
+</section>
+
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox" role="dialog" aria-hidden="true">
+    <button class="close" title="Close (Esc)" aria-label="Close">&times;</button>
+    <button class="prev control" title="Previous (Left)">&lsaquo;</button>
+    <img src="" alt="" id="lightbox-img">
+    <button class="next control" title="Next (Right)">&rsaquo;</button>
+</div>
+
+<script>
+/* ---------------------------
+   HERO SLIDESHOW (fade)
+   --------------------------- */
+(function(){
+    const slides = Array.from(document.querySelectorAll('.hero .slide'));
+    // If no slides, exit
+    if (!slides.length) return;
+
+    // Preload images and set background styles
+    slides.forEach(s=>{
+        const src = s.getAttribute('data-src');
+        s.style.backgroundImage = `url('${src}')`;
+        // small overlay opacity already added via hero::after
+    });
+
+    let idx = 0;
+    const showSlide = (i) => {
+        slides.forEach((s, j) => {
+            s.classList.toggle('show', j === i);
+        });
+    };
+
+    showSlide(idx);
+    setInterval(()=> {
+        idx = (idx + 1) % slides.length;
+        showSlide(idx);
+    }, 5000); // 5000ms = 5s
+})();
+
+/* ---------------------------
+   LIGHTBOX + GALLERY HANDLER
+   --------------------------- */
+(function(){
+    const galleryGrid = document.getElementById('gallery-grid');
+    const cards = Array.from(galleryGrid.querySelectorAll('.card'));
+    const imgs = cards.map(c => c.querySelector('img'));
+    const lightbox = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lightbox-img');
+    const btnClose = lightbox.querySelector('.close');
+    const btnNext = lightbox.querySelector('.next');
+    const btnPrev = lightbox.querySelector('.prev');
+
+    let current = 0;
+
+    // open function
+    function open(index){
+        current = index;
+        lbImg.src = imgs[current].src;
+        lbImg.alt = imgs[current].alt || '';
+        lightbox.classList.add('show');
+        lightbox.setAttribute('aria-hidden','false');
+        // focus for keyboard
+        btnClose.focus();
+    }
+
+    // close function
+    function close(){
+        lightbox.classList.remove('show');
+        lightbox.setAttribute('aria-hidden','true');
+    }
+
+    // next/prev
+    function next(){
+        current = (current + 1) % imgs.length;
+        lbImg.src = imgs[current].src;
+        lbImg.alt = imgs[current].alt || '';
+    }
+    function prev(){
+        current = (current - 1 + imgs.length) % imgs.length;
+        lbImg.src = imgs[current].src;
+        lbImg.alt = imgs[current].alt || '';
+    }
+
+    // click each image to open
+    imgs.forEach((img, i) => {
+        img.style.cursor = 'zoom-in';
+        img.addEventListener('click', ()=> open(i));
+    });
+
+    // controls
+    btnClose.addEventListener('click', close);
+    btnNext.addEventListener('click', next);
+    btnPrev.addEventListener('click', prev);
+
+    // click outside image to close
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) close();
+    });
+
+    // keyboard support
+    document.addEventListener('keydown', (e) => {
+        if (lightbox.classList.contains('show')) {
+            if (e.key === 'Escape') close();
+            if (e.key === 'ArrowRight') next();
+            if (e.key === 'ArrowLeft') prev();
+        }
+    });
+})();
+
+/* ---------------------------
+   LOAD MORE (simple demo)
+   --------------------------- */
+function loadMore(){
+    const grid = document.getElementById('gallery-grid');
+
+    // Example images to append (duplicates for demo)
+    const more = [
+        {src:"IMG-20251126-WA0028.jpg", title:"New Study", price:"From ₹220"},
+        {src:"", title:"Evening Lights", price:"From ₹260"},
+        {src:"", title:"Seaside Frame", price:"From ₹300"}
+    ];
+
+    more.forEach(item=>{
+        const art = document.createElement('article');
+        art.className = 'card';
+        art.innerHTML = `
+            <img src="${item.src}" alt="${item.title}">
+            <div class="meta">
+                <h3>${item.title}</h3>
+                <p>${item.price}</p>
+            </div>
+        `;
+        grid.appendChild(art);
+    });
+
+    // reinitialize lightbox binding for newly added images:
+    rebindLightbox();
+}
+
+/* Rebind function: attach click handlers to newly added images */
+function rebindLightbox(){
+    // remove and re-run the lightbox module quickly by re-adding listeners
+    // simple approach: remove old listeners by cloning the element
+    const oldGrid = document.getElementById('gallery-grid');
+    const cards = Array.from(oldGrid.querySelectorAll('.card'));
+    const imgs = cards.map(c => c.querySelector('img'));
+
+    // lightbox references
+    const lightbox = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lightbox-img');
+    const btnClose = lightbox.querySelector('.close');
+    const btnNext = lightbox.querySelector('.next');
+    const btnPrev = lightbox.querySelector('.prev');
+
+    // detach prior click handlers by cloning nodes (simple and safe)
+    imgs.forEach((img) => {
+        // no-op; ensure cursor
+        img.style.cursor = 'zoom-in';
+    });
+
+    // rewire open action: (we'll use a fresh index mapping each call)
+    imgs.forEach((img, index) => {
+        img.onclick = function(){ 
+            // Build current img list at moment of click
+            const curImgs = Array.from(document.querySelectorAll('#gallery-grid .card img'));
+            let idx = curImgs.indexOf(img);
+            lbImg.src = curImgs[idx].src;
+            lbImg.alt = curImgs[idx].alt || '';
+            lightbox.classList.add('show');
+            lightbox.setAttribute('aria-hidden','false');
+            btnClose.focus();
+
+            // Next/Prev using the updated curImgs list
+            btnNext.onclick = function(){ 
+                idx = (idx + 1) % curImgs.length; 
+                lbImg.src = curImgs[idx].src; 
+            };
+            btnPrev.onclick = function(){ 
+                idx = (idx - 1 + curImgs.length) % curImgs.length; 
+                lbImg.src = curImgs[idx].src; 
+            };
+        };
+    });
+}
+
+/* Basic helper for header nav */
+function scrollToSection(id){
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({behavior:'smooth'});
+}
+
+/* On load, ensure rebind in case of dynamic changes */
+document.addEventListener('DOMContentLoaded', rebindLightbox);
+</script>
+
+</body>
+</html>
