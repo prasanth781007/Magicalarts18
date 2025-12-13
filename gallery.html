@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Magicalarts — Gallery</title>
+
+<style>
+/* ===========================
+   THEME
+=========================== */
+:root{
+    --accent:#ff9a76;
+    --dark-bg:#1a1200;
+    --card-bg:#2a1f08;
+    --light-text:#f5f5f5;
+    --gray-text:#cfc7bf;
+    --radius:12px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+    font-family:Inter,Arial;
+    background:var(--dark-bg);
+    color:var(--light-text);
+}
+
+/* ===========================
+    HEADER + MENU
+=========================== */
+header{
+    height:70px;
+    background:rgba(26,18,0,0.92);
+    position:fixed;
+    top:0;left:0;right:0;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 20px;
+    z-index:3000;
+    box-shadow:0 2px 8px rgba(0,0,0,.4);
+}
+.logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:20px;
+    font-weight:700;
+}
+.logo img{
+    height:40px;
+    width:40px;
+    border-radius:50%;
+}
+
+nav.nav{
+    display:flex;
+    gap:20px;
+}
+nav.nav a{
+    color:white;
+    text-decoration:none;
+    padding:8px 12px;
+    border-radius:8px;
+    font-weight:600;
+}
+nav.nav a:hover,
+nav.nav a.active{
+    background:rgba(255,255,255,0.1);
+}
+
+/* Mobile menu */
+.menu-btn{
+    display:none;
+    font-size:28px;
+    background:none;
+    border:none;
+    color:white;
+}
+
+@media(max-width:700px){
+    nav.nav{
+        display:none;
+        position:absolute;
+        top:70px; right:0; left:0;
+        flex-direction:column;
+        background:#2a1f08;
+        padding:20px 0;
+        border-bottom:2px solid var(--accent);
+    }
+    nav.nav.show{
+        display:flex;
+    }
+    .menu-btn{
+        display:block;
+    }
+}
+
+/* ===========================
+    HERO SLIDESHOW
+=========================== */
+.hero{
+    height:75vh;
+    margin-top:70px;
+    position:relative;
+    overflow:hidden;
+}
+.hero .slide{
+    position:absolute;
+    inset:0;
+    background-size:cover;
+    background-position:center;
+    opacity:0;
+    transition:opacity 1s ease;
+}
+.hero .slide.show{opacity:1}
+.hero::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.8));
+}
+.hero-content{
+    position:absolute;
+    top:50%; left:50%;
+    transform:translate(-50%,-50%);
+    text-align:center;
+    color:white;
+    z-index:10;
+}
+
+/* ===========================
+    SECTION
+=========================== */
+.section{
+    padding:60px 20px;
+    max-width:1200px;
+    margin:auto;
+}
+
+/* ===========================
+   ⭐ MASONRY LAYOUT ⭐
+=========================== */
+.grid{
+    column-count:3;
+    column-gap:20px;
+}
+@media(max-width:900px){.grid{column-count:2}}
+@media(max-width:600px){.grid{column-count:1}}
+
+.card{
+    display:inline-block;
+    width:100%;
+    margin-bottom:20px;
+    background:var(--card-bg);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 6px 18px rgba(0,0,0,.35);
+    transition:.3s;
+}
+.card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 18px 40px rgba(0,0,0,.5);
+}
+.card img{
+    width:100%;
+    height:auto;
+    display:block;
+}
+
+.meta{padding:12px}
+.meta h3{color:var(--accent);font-size:17px}
+
+/* ===========================
+    LOAD MORE BUTTON
+=========================== */
+.load-more-btn{
+    margin:25px auto;
+    display:block;
+    padding:12px 22px;
+    background:var(--accent);
+    border:none;
+    border-radius:25px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+/* ===========================
+    LIGHTBOX
+=========================== */
+.lightbox{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.85);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:4000;
+}
+.lightbox.show{display:flex}
+.lightbox img{
+    max-width:90%;
+    max-height:85vh;
+    border-radius:12px;
+}
+.lightbox button{
+    position:fixed;
+    font-size:32px;
+    background:none;
+    border:none;
+    color:white;
+}
+.close{top:20px;right:20px}
+.prev{left:20px;top:50%}
+.next{right:20px;top:50%}
+
+/* ===========================
+    FOOTER
+=========================== */
+footer{
+    background:#0f0a00;
+    padding:30px 20px;
+    margin-top:40px;
+    text-align:center;
+    color:#d8d3c8;
+    border-top:2px solid var(--accent);
+}
+footer h3{
+    margin-bottom:10px;
+    color:var(--accent);
+}
+footer p{
+    margin:4px 0;
+    font-size:15px;
+}
+</style>
+</head>
+<body>
+
+<!-- ===========================
+      HEADER
+=========================== -->
+<header>
+    <div class="logo">
+        <img src="Image/logo.png">
+        Magicalarts
+    </div>
+
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+    <nav class="nav" id="menu">
+        <a href="index.html">Home</a>
+        <a class="active" href="#gallery">Gallery</a>
+        <a href="#contact">Contact</a>
+    </nav>
+</header>
+
+<!-- ===========================
+      HERO
+=========================== -->
+<section class="hero">
+    <div class="slide" data-src="Image/IMG-20251126-WA0039.jpg"></div>
+    <div class="slide" data-src="Image/IMG-20251126-WA0031.jpg"></div>
+    <div class="slide" data-src="Image/IMG-20251126-WA0032.jpg"></div>
+    <div class="slide" data-src="Image/IMG-20251126-WA0039.jpg"></div>
+
+    <div class="hero-content">
+        <h1>Discover Beautiful Artwork</h1>
+        <p>Uniquely handcrafted visuals for every soul.</p>
+    </div>
+</section>
+
+<!-- ===========================
+      GALLERY
+=========================== -->
+<section class="section" id="gallery">
+    <h2 style="text-align:center;margin-bottom:25px;">Gallery</h2>
+
+    <div class="grid" id="gallery-grid">
+
+        <!-- 🔥 DEFAULT 12 IMAGES -->
+        <!-- (Same as previous version, kept exactly) -->
+
+        <article class="card"><img src="Image/IMG-20251126-WA0034.jpg"><div class="meta"><h3>Studio Study</h3></div></article>
+        <article class="card"><img src="Image/IMG-20251126-WA0031.jpg"><div class="meta"><h3>Evening Lights</h3></div></article>
+        <article class="card"><img src="Image/IMG-20251126-WA0032.jpg"><div class="meta"><h3>Seaside Frame</h3></div></article>
+        <article class="card"><img src="Image/IMG-20251126-WA0028.jpg"><div class="meta"><h3>Golden Sunset</h3></div></article>
+        <article class="card"><img src="Image/color3.jpg"><div class="meta"><h3>Vibrant Shade</h3></div></article>
+        <article class="card"><img src="Image/IMG-20251126-WA0039.jpg"><div class="meta"><h3>Classic Portrait</h3></div></article>
+
+        <article class="card"><img src="Image/pencil1.jpg"><div class="meta"><h3>Charcoal Essence</h3></div></article>
+        <article class="card"><img src="Image/pencil2.jpg"><div class="meta"><h3>Line Whisper</h3></div></article>
+        <article class="card"><img src="Image/pencil3.jpg"><div class="meta"><h3>Graphite Mood</h3></div></article>
+        <article class="card"><img src="Image/pencil4.jpg"><div class="meta"><h3>Sketchbook Scene</h3></div></article>
+        <article class="card"><img src="Image/IMG-20251126-WA0038.jpg"><div class="meta"><h3>Artistic Shot</h3></div></article>
+        <article class="card"><img src="Image/IMG-20251126-WA0036.jpg"><div class="meta"><h3>Dreamy Landscape</h3></div></article>
+
+    </div>
+
+    <!-- BUTTON -->
+    <button class="load-more-btn" onclick="loadMore()">Load More</button>
+</section>
+
+<!-- ===========================
+      FOOTER
+=========================== -->
+<footer id="contact">
+    <h3>Magicalarts</h3>
+    <p>Email: magicalarts18@gmail.com</p>
+    <p>Phone: +91 8248678722</p>
+    <p>© 2025 Magicalarts. All rights reserved.</p>
+</footer>
+
+<!-- ===========================
+      JS
+=========================== -->
+<script>
+/* --------------------
+   MENU
+-------------------- */
+function toggleMenu(){
+    document.getElementById("menu").classList.toggle("show");
+}
+
+/* --------------------
+   SLIDESHOW
+-------------------- */
+const slides=document.querySelectorAll(".slide");
+slides.forEach(s=>s.style.backgroundImage=`url('${s.dataset.src}')`);
+let i=1;
+setInterval(()=>{
+    slides.forEach((s,idx)=>s.classList.toggle("show",idx===i));
+    i=(i+1)%slides.length;
+},3000);
+
+/* --------------------
+   LOAD MORE
+-------------------- */
+const moreImages=[
+    {src:"Image/pencil5.jpg", title:"Portrait Lines"},
+    {src:"Image/pencil6.jpg", title:"Fine Contour"},
+    {src:"Image/IMG-20251212-WA0021.jpg", title:"Natural Frame"},
+    {src:"Image/IMG-20251126-WA0034.jpg", title:"Studio Vibes"},
+];
+
+function loadMore(){
+    const container=document.getElementById("gallery-grid");
+    moreImages.forEach(item=>{
+        container.innerHTML+=`
+            <article class="card">
+                <img src="${item.src}">
+                <div class="meta"><h3>${item.title}</h3></div>
+            </article>
+        `;
+    });
+    document.querySelector(".load-more-btn").style.display="none";
+    enableLightbox();  
+}
+
+/* --------------------
+   LIGHTBOX  
+-------------------- */
+let imgs=[], index=0;
+
+function enableLightbox(){
+    imgs=[...document.querySelectorAll("#gallery-grid img")];
+    imgs.forEach((img,i)=>{
+        img.onclick=()=>{
+            index=i;
+            lb.classList.add("show");
+            lbImg.src=img.src;
+        };
+    });
+}
+enableLightbox();
+
+const lb=document.getElementById("lightbox");
+const lbImg=document.getElementById("lightbox-img");
+
+document.querySelector(".close").onclick=()=>lb.classList.remove("show");
+document.querySelector(".next").onclick=()=>{
+    index=(index+1)%imgs.length;
+    lbImg.src=imgs[index].src;
+};
+document.querySelector(".prev").onclick=()=>{
+    index=(index-1+imgs.length)%imgs.length;
+    lbImg.src=imgs[index].src;
+};
+</script>
+
+</body>
+</html>
