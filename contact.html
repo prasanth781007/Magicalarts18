@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Magicalarts — Contact Us</title>
+
+    <style>
+        /* ====================
+           THEMING VARIABLES
+           ==================== */
+        :root {
+            --bg-color: #1a1200;
+            --text-color: #f5f5f5;
+            --accent: #E67E22;
+            --accent-light: #ff9a76;
+            --gray-text: #aaaaaa;
+            --card-bg: #2a1f08;
+            --header-bg: rgba(26, 18, 0, 0.85);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --shadow: 0 10px 25px rgba(0,0,0,0.4);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        body.light-theme {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --accent: #d35400;
+            --accent-light: #ff9a76;
+            --gray-text: #6c757d;
+            --card-bg: #ffffff;
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --input-bg: rgba(0, 0, 0, 0.05);
+            --shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        h1, h2, h3, h4, h5 { font-family: 'Playfair Display', serif; font-weight: 600; }
+
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* HEADER */
+        header {
+            background-color: var(--header-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: fixed; width: 100%; top: 0; z-index: 1000;
+            padding: 15px 0; border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .header-container { display: flex; justify-content: space-between; align-items: center; }
+
+        .logo {
+            display: flex; align-items: center; gap: 10px; font-size: 1.5rem;
+            color: var(--text-color); text-decoration: none; font-weight: 700;
+        }
+
+        .nav-menu { display: flex; gap: 30px; align-items: center; }
+        .nav-menu a {
+            color: var(--text-color); text-decoration: none; font-weight: 500;
+            transition: var(--transition); position: relative;
+        }
+        .nav-menu a:hover { color: var(--accent); }
+        .nav-menu a.active { color: var(--accent); font-weight: 600; }
+
+        .theme-btn {
+            background: none; border: 2px solid var(--accent); color: var(--text-color);
+            padding: 8px 12px; border-radius: 20px; cursor: pointer;
+            font-size: 1rem; display: flex; align-items: center; gap: 5px;
+            transition: var(--transition);
+        }
+        .theme-btn:hover { background: var(--accent); color: white; }
+
+        .hamburger { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-color); }
+
+        /* HERO SECTION */
+        .contact-hero {
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('Image/IMG-20251126-WA0034.jpg');
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+            height: 60vh; display: flex; align-items: center; text-align: center;
+            position: relative; margin-top: 70px;
+        }
+        .contact-hero-content { position: relative; z-index: 2; max-width: 800px; margin: 0 auto; }
+        .contact-hero h1 { font-size: 3.5rem; margin-bottom: 20px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .contact-hero p { font-size: 1.2rem; margin-bottom: 30px; color: #f0f0f0; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+
+        /* CONTACT MAIN SECTION */
+        section { padding: 80px 0; }
+        .section-title { text-align: center; margin-bottom: 50px; }
+        .section-title h2 { font-size: 2.5rem; margin-bottom: 15px; color: var(--text-color); }
+        .section-title p { color: var(--gray-text); max-width: 600px; margin: 0 auto; }
+
+        /* CONTACT CONTAINER */
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .contact-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* CONTACT INFO CARDS */
+        .contact-info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .contact-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+            border-color: var(--accent);
+        }
+
+        .contact-card i {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+
+        .contact-card h3 {
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .contact-card p {
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .contact-link {
+            color: var(--accent-light);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .contact-link:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        /* BUSINESS HOURS */
+        .hours-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .hours-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* SOCIAL MEDIA LINKS */
+        .social-links-contact {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links-contact a {
+            display: flex; align-items: center; justify-content: center; width: 50px; height: 50px;
+            background-color: var(--input-bg); border-radius: 50%; color: var(--text-color);
+            transition: var(--transition); font-size: 1.2rem;
+        }
+
+        .social-links-contact a:hover {
+            background-color: var(--accent); color: white; transform: translateY(-3px);
+        }
+
+        /* PHOTO REFERENCE SECTION */
+        .photo-reference {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-top: 20px;
+            border: 1px solid var(--accent);
+        }
+
+        .photo-reference h4 {
+            color: var(--accent);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .photo-reference p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .photo-numbers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .photo-number {
+            background-color: var(--input-bg);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+        }
+
+        /* CONTACT FORM */
+        .contact-form-container {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-color); }
+        .form-control {
+            width: 100%; padding: 12px 15px; background-color: var(--input-bg);
+            border: 1px solid var(--border-color); border-radius: var(--border-radius);
+            color: var(--text-color); font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+        }
+        .form-control:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.2); }
+
+        textarea.form-control { min-height: 150px; resize: vertical; }
+
+        .btn {
+            display: inline-block; padding: 12px 30px; background-color: var(--accent);
+            color: white; border: none; border-radius: var(--border-radius); font-weight: 600;
+            text-decoration: none; cursor: pointer; transition: var(--transition); margin: 5px;
+        }
+        .btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+        .btn-block { width: 100%; text-align: center; }
+
+        .loading-spinner {
+            display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--accent); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-right: 10px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* FAQ SECTION */
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .faq-question:hover {
+            background-color: var(--input-bg);
+        }
+
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            color: var(--gray-text);
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 20px;
+            max-height: 500px;
+        }
+
+        .faq-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        /* LOCATION MAP */
+        .map-container {
+            margin-top: 80px;
+            text-align: center;
+        }
+
+        .map-placeholder {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 60px 40px;
+            margin-top: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .map-placeholder i {
+            font-size: 4rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+
+        /* FOOTER */
+        footer { background-color: #0f0b00; padding: 60px 0 30px; color: #f5f5f5; }
+        body.light-theme footer { background-color: #1a1a1a; }
+        .footer-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px; }
+        .footer-logo { font-size: 1.8rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .social-links { display: flex; gap: 15px; }
+        .social-links a {
+            display: flex; align-items: center; justify-content: center; width: 40px; height: 40px;
+            background-color: rgba(255, 255, 255, 0.1); border-radius: 50%; color: white; transition: var(--transition);
+        }
+        .social-links a:hover { background-color: var(--accent); transform: translateY(-3px); }
+        .footer-links a { color: #aaaaaa; text-decoration: none; transition: var(--transition); }
+        .footer-links a:hover { color: var(--accent); padding-left: 5px; }
+        .copyright { text-align: center; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaaaaa; font-size: 0.9rem; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .contact-hero h1 { font-size: 2.2rem; }
+            .nav-menu {
+                display: none; position: fixed; top: 70px; right: 0; width: 70%;
+                height: calc(100vh - 70px); background-color: var(--card-bg);
+                flex-direction: column; padding: 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+                border-left: 1px solid var(--border-color); z-index: 1000; overflow-y: auto;
+                transition: transform 0.3s ease; transform: translateX(100%); align-items: flex-start;
+            }
+            .nav-menu.active { display: flex; transform: translateX(0); }
+            .nav-menu a { padding: 15px 0; border-bottom: 1px solid var(--border-color); width: 100%; font-size: 1.1rem; text-align: left; }
+            .hamburger { display: block; }
+            .contact-form-container { padding: 25px; }
+        }
+        #mobile-menu-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); z-index: 999; backdrop-filter: blur(2px); display: none;
+        }
+        #mobile-menu-overlay.active { display: block; }
+        .hidden { display: none; }
+
+        /* MESSAGE STYLES */
+        .message-success {
+            background-color: rgba(39, 174, 96, 0.1);
+            border: 1px solid #27ae60;
+            color: #27ae60;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .message-error {
+            background-color: rgba(231, 76, 60, 0.1);
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .message-success.show,
+        .message-error.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="">
+    <header>
+        <div class="container header-container">
+            <a href="index.html" class="logo">
+                <img src="Image/logo.png" style="height:40px; width:40px; border-radius:50px;">
+                <span>MagicalArts</span>
+            </a>
+            <button id="theme-toggle" class="theme-btn">
+                <i class="fas fa-moon"></i>
+            </button>
+            <nav class="nav-menu">
+                <a href="index.html">Home</a>
+                <a href="gallery.html">Gallery</a>
+                <a href="#" class="active">Contact</a>
+                <a href="index.html#customization">Customize</a>
+                <a href="index.html#checkout">Order</a>
+            </nav>
+            <div class="hamburger"><i class="fas fa-bars"></i></div>
+        </div>
+    </header>
+
+    <section class="contact-hero">
+        <div class="container contact-hero-content">
+            <h1>Get in Touch with MagicalArts</h1>
+            <p>Have questions about custom artwork? Need assistance with an order? We're here to help transform your vision into reality.</p>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="container">
+            <div class="section-title">
+                <h2>Contact Us</h2>
+                <p>Choose your preferred method to reach out to our team</p>
+            </div>
+            
+            <div class="contact-container">
+                <!-- Contact Information -->
+                <div class="contact-info-grid">
+                    <div class="contact-card">
+                        <i class="fas fa-envelope"></i>
+                        <h3>Email Us</h3>
+                        <p>For order inquiries and general questions</p>
+                        <a href="mailto:magicalarts18@gmail.com" class="contact-link">magicalarts18@gmail.com</a>
+                        <p style="margin-top: 15px;"><small>We typically respond within 24 hours</small></p>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <i class="fas fa-phone-alt"></i>
+                        <h3>Call / WhatsApp</h3>
+                        <p>For urgent inquiries and order discussions</p>
+                        <a href="tel:+918248678722" class="contact-link">+91 82486 78722</a>
+                        <p><a href="https://wa.me/917810078875" class="contact-link">WhatsApp: +91 78100 78875</a></p>
+                        <p style="margin-top: 15px;"><small>Mon-Sat: 9AM - 8PM IST</small></p>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <i class="fas fa-clock"></i>
+                        <h3>Business Hours</h3>
+                        <ul class="hours-list">
+                            <li><span>Monday - Friday</span> <span>9:00 AM - 8:00 PM</span></li>
+                            <li><span>Saturday</span> <span>10:00 AM - 6:00 PM</span></li>
+                            <li><span>Sunday</span> <span>By Appointment Only</span></li>
+                        </ul>
+                    </div>
+                    
+                   
+                    
+                    <div class="contact-card">
+                        <i class="fas fa-hashtag"></i>
+                        <h3>Follow Us</h3>
+                        <p>Stay updated with our latest artwork</p>
+                        <div class="social-links-contact">
+                            <a href="https://www.instagram.com/magicalarts18" title="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="https://whatsapp.com/channel/0029VbBcStfHgZWafZuurC2h" title="WhatsApp Channel"><i class="fab fa-whatsapp"></i></a>
+                            <a href="https://www.linkedin.com/in/prasanth-k-741b64381" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contact Form -->
+                <div class="contact-form-container">
+                    <h3 style="margin-bottom: 25px; color: var(--accent);">Send a Message</h3>
+                    <form id="contact-form">
+                        <div class="form-group">
+                            <label for="contact-name">Your Name *</label>
+                            <input type="text" id="contact-name" class="form-control" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contact-email">Email Address *</label>
+                            <input type="email" id="contact-email" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contact-phone">Phone Number *</label>
+                            <input type="tel" id="contact-phone" class="form-control" placeholder="Enter your phone number" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="contact-subject">Subject</label>
+                            <select id="contact-subject" class="form-control">
+                                <option value="">Select a subject</option>
+                                <option value="Custom Order Inquiry">Custom Order Inquiry</option>
+                                <option value="Existing Order Status">Existing Order Status</option>
+                                <option value="Pricing Information">Pricing Information</option>
+                                <option value="Gallery Photo Inquiry">Gallery Photo Inquiry</option>
+                                <option value="Collaboration Request">Collaboration Request</option>
+                                <option value="General Question">General Question</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+
+                        <div class="form-group">
+                            <label for="contact-message">Your Message *</label>
+                            <textarea id="contact-message" class="form-control" placeholder="Please provide details about your inquiry..." required></textarea>
+                        </div>
+                        
+                        <div id="contact-success" class="message-success">
+                            <i class="fas fa-check-circle"></i> Thank you! Your message has been sent successfully. We'll respond within 24 hours.
+                        </div>
+                        
+                        <div id="contact-error" class="message-error">
+                            <i class="fas fa-exclamation-triangle"></i> There was an error sending your message. Please try again or contact us directly.
+                        </div>
+                        
+                        <button type="submit" id="contact-submit-btn" class="btn btn-block">
+                            <span id="submit-text">Send Message</span>
+                            <span id="submit-spinner" class="loading-spinner hidden"></span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq">
+        <div class="container">
+            <div class="section-title">
+                <h2>Frequently Asked Questions</h2>
+                <p>Quick answers to common questions about our services</p>
+            </div>
+            
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        How long does it take to complete a custom painting?
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Most standard portraits take 7-10 days to complete. Complex pieces or multiple subjects may require 2-3 weeks. We'll provide a timeline when you place your order.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        What's your payment policy?
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        All orders require prepayment before we begin work. We accept payments via UPI, bank transfer, and other digital methods. Our customer care team will contact you with payment details.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Can I request changes after the painting has started?
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Minor adjustments can be made during the initial sketch phase. Once color application begins, changes may be limited. We'll share progress photos for your approval at key stages.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Do you ship internationally?
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        Currently, we primarily serve customers within India. For international orders, please contact us directly to discuss shipping options and additional costs.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        What materials do you use for paintings?
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        We use high-quality art supplies including professional-grade pencils, watercolors, and acrylics on premium art paper or canvas. Each piece is carefully finished to ensure longevity.
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        How do I reference a specific photo from your gallery?
+                        <i class="fas fa-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        When contacting us about artwork from our gallery, please use the photo reference numbers provided on this page. This helps us quickly identify the specific piece you're interested in.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="location" class="map-container">
+        <div class="container">
+            <div class="section-title">
+                <h2>Our Location</h2>
+                <p>Based in India, creating art for customers worldwide</p>
+            </div>
+            
+            <div class="map-placeholder">
+                <i class="fas fa-map-marker-alt"></i>
+                <h3>MagicalArts Studio</h3>
+                <p>India</p>
+                <p style="margin-top: 20px;">While we don't have a physical storefront open to the public, all our artwork is created in our dedicated studio. We work with clients remotely through digital communication.</p>
+                <p style="margin-top: 10px;"><em>For local pickup arrangements, please contact us directly.</em></p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-about">
+                    <div class="footer-logo">
+                        <img src="Image/logo.png" style="height:40px; width:40px; border-radius:50px;">
+                        <span>MagicalArts</span>
+                    </div>
+                    <p>Transforming visions into timeless artwork since 2025.</p>
+                    <div class="social-links">
+                        <a href="https://www.instagram.com/magicalarts18"><i class="fab fa-instagram"></i></a>
+                        <a href="https://whatsapp.com/channel/0029VbBcStfHgZWafZuurC2h"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.linkedin.com/in/prasanth-k-741b64381"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="index.html#customization">Customize</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contact Info</h3>
+                    <p><i class="fas fa-phone"></i> +91 82486 78722</p>
+                    <p><i class="fas fa-envelope"></i> magicalarts18@gmail.com</p>
+                    <p><i class="fas fa-clock"></i> Mon-Sat: 9AM-8PM IST</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 MagicalArts. All rights reserved. Created by <a href="https://prasanth781007.github.io/Portfolio-/project%20.html" style="color:var(--accent);">Prasanth</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <script>
+        // =========================
+        // EMAILJS CONFIGURATION
+        // =========================
+        const EMAIL_CONFIG = {
+            serviceId: "service_xqqienm",
+            templateId: "template_kwuje2t",
+            publicKey: "6N_lqIvH8QuvPEEbT"
+        };
+
+        // =========================
+        // INITIALIZE EMAILJS
+        // =========================
+        (function() {
+            emailjs.init(EMAIL_CONFIG.publicKey);
+            console.log("✓ EmailJS initialized for contact form");
+        })();
+
+        // =========================
+        // THEME TOGGLE
+        // =========================
+        const themeBtn = document.getElementById('theme-toggle');
+        const themeIcon = themeBtn ? themeBtn.querySelector('i') : null;
+        const body = document.body;
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            body.classList.add('light-theme');
+            updateThemeBtn('light');
+        } else {
+            updateThemeBtn('dark');
+        }
+
+        themeBtn.addEventListener('click', () => {
+            body.classList.toggle('light-theme');
+            const isLight = body.classList.contains('light-theme');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            updateThemeBtn(isLight ? 'light' : 'dark');
+        });
+
+        function updateThemeBtn(mode) {
+            if (!themeIcon) return;
+            if (mode === 'light') {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
+
+        // =========================
+        // MOBILE MENU
+        // =========================
+        const hamburger = document.querySelector('.hamburger');
+        const navMenu = document.querySelector('.nav-menu');
+        const overlay = document.createElement('div');
+        overlay.id = 'mobile-menu-overlay';
+        document.body.appendChild(overlay);
+
+        function toggleMenu() {
+            navMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+            const icon = hamburger.querySelector('i');
+            if(navMenu.classList.contains('active')) {
+                icon.classList.remove('fa-bars'); 
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times'); 
+                icon.classList.add('fa-bars');
+            }
+        }
+
+        if(hamburger) {
+            hamburger.addEventListener('click', toggleMenu);
+            overlay.addEventListener('click', toggleMenu);
+            document.querySelectorAll('.nav-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if(window.innerWidth <= 768) toggleMenu();
+                });
+            });
+        }
+
+        // =========================
+        // FAQ ACCORDION
+        // =========================
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                item.classList.toggle('active');
+            });
+        });
+
+        // =========================
+        // CONTACT FORM SUBMISSION WITH EMAILJS
+        // =========================
+        const contactForm = document.getElementById('contact-form');
+        const submitBtn = document.getElementById('contact-submit-btn');
+        const submitText = document.getElementById('submit-text');
+        const submitSpinner = document.getElementById('submit-spinner');
+        const successMsg = document.getElementById('contact-success');
+        const errorMsg = document.getElementById('contact-error');
+
+        if(contactForm) {
+            contactForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Validation
+                const name = document.getElementById('contact-name').value.trim();
+                const email = document.getElementById('contact-email').value.trim();
+                const phone = document.getElementById('contact-phone').value.trim();
+                const message = document.getElementById('contact-message').value.trim();
+                
+                if(!name || !email || !phone || !message) {
+                    alert("Please fill in all required fields: Name, Email, Phone, and Message");
+                    return;
+                }
+                
+                // Show loading state
+                submitText.textContent = 'Sending...';
+                submitSpinner.classList.remove('hidden');
+                submitBtn.disabled = true;
+                successMsg.classList.remove('show');
+                errorMsg.classList.remove('show');
+                
+                // Prepare email data
+                const templateParams = {
+                    from_name: name,
+                    from_email: email,
+                    from_phone: phone,
+                    subject: document.getElementById('contact-subject').value || 'General Inquiry',
+                    photo_reference: document.getElementById('photo-reference').value || 'Not specified',
+                    message: message,
+                    to_email: "magicalarts18@gmail.com",
+                    date_sent: new Date().toLocaleString('en-IN', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    })
+                };
+                
+                try {
+                    // Send email via EmailJS
+                    const response = await emailjs.send(
+                        EMAIL_CONFIG.serviceId,
+                        EMAIL_CONFIG.templateId,
+                        templateParams
+                    );
+                    
+                    console.log('✅ Email sent successfully:', response);
+                    
+                    // Reset form
+                    contactForm.reset();
+                    
+                    // Show success message
+                    successMsg.classList.add('show');
+                    
+                    // Hide success message after 5 seconds
+                    setTimeout(() => {
+                        successMsg.classList.remove('show');
+                    }, 5000);
+                    
+                } catch (error) {
+                    console.error('❌ Email sending error:', error);
+                    
+                    // Show error message
+                    errorMsg.classList.add('show');
+                    
+                    // Hide error message after 5 seconds
+                    setTimeout(() => {
+                        errorMsg.classList.remove('show');
+                    }, 5000);
+                    
+                } finally {
+                    // Reset button state
+                    submitText.textContent = 'Send Message';
+                    submitSpinner.classList.add('hidden');
+                    submitBtn.disabled = false;
+                }
+            });
+        }
+
+        // =========================
+        // AUTO-FILL PHOTO REFERENCE WHEN SELECTING GALLERY INQUIRY
+        // =========================
+        const subjectSelect = document.getElementById('contact-subject');
+        const photoRefInput = document.getElementById('photo-reference');
+        
+        if(subjectSelect && photoRefInput) {
+            subjectSelect.addEventListener('change', function() {
+                if(this.value === 'Gallery Photo Inquiry') {
+                    photoRefInput.placeholder = "e.g., IMG-20251126-WA0034 (Required for gallery inquiries)";
+                } else {
+                    photoRefInput.placeholder = "e.g., IMG-20251126-WA0034";
+                }
+            });
+        }
+    </script>
+</body>
+</html>
