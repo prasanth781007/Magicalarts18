@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Magicalarts - Custom Paintings</title>
+
+    <style>
+      /* --- OVERLAY --- */
+    .app-dialog-overlay {
+        display: none;      
+        position: fixed;    
+        z-index: 100;       
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;     
+        background-color: rgba(0,0,0,0.6); 
+    }
+
+    /* --- CONTENT BOX (The White Card) --- */
+    .app-dialog-content {
+        background-color: #fefefe; 
+        color:black;        /* 🎯 40px margin applied here */
+        margin: 40px; 
+        padding: 35px; 
+        border: none;              /* Centering */
+        position: absolute;
+        top: 50%;
+        left: 40%;
+        transform: translate(-50%, -50%);        
+        width: 90%; 
+        max-width: 300px;               /* >>> SCROLLABILITY ADDITIONS <<< */
+        max-height: 80vh;      /* Limits the height to 80% of the viewport height */
+        overflow-y: auto;      /* Makes content scrollable if it exceeds max-height */       /* >>> END SCROLLABILITY ADDITIONS <<< */       
+        border-radius: 12px; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.4); 
+    }
+
+    /* --- CLOSE BUTTON --- */
+    .app-dialog-close-btn {
+        color: #333; 
+        float: right;
+        font-size: 30px;
+        font-weight: 300; 
+        line-height: 1; 
+        cursor: pointer;
+    }
+
+    .app-dialog-close-btn:hover,
+    .app-dialog-close-btn:focus {
+        color: #007bff; 
+    }
+
+    /* Optional: Style the main button */
+    
+        /* ====================
+           THEMING VARIABLES
+           ==================== */
+        :root {
+            --bg-color: #1a1200;
+            --text-color: #f5f5f5;
+            --accent: #E67E22;
+            --gray-text: #aaaaaa;
+            --card-bg: #2a1f08;
+            --header-bg: rgba(26, 18, 0, 0.85);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --shadow: 0 10px 25px rgba(0,0,0,0.4);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        body.light-theme {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --accent: #d35400;
+            --gray-text: #6c757d;
+            --card-bg: #ffffff;
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --input-bg: rgba(0, 0, 0, 0.05);
+            --shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        h1, h2, h3, h4, h5 { font-family: 'Playfair Display', serif; font-weight: 600; }
+
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* HEADER */
+        header {
+            background-color: var(--header-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: fixed; width: 100%; top: 0; z-index: 1000;
+            padding: 15px 0; border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .header-container { display: flex; justify-content: space-between; align-items: center; }
+
+        .logo {
+            display: flex; align-items: center; gap: 10px; font-size: 1.5rem;
+            color: var(--text-color); text-decoration: none; font-weight: 700;
+        }
+
+        .nav-menu { display: flex; gap: 30px; align-items: center; }
+        .nav-menu a {
+            color: var(--text-color); text-decoration: none; font-weight: 500;
+            transition: var(--transition); position: relative;
+        }
+        .nav-menu a:hover { color: var(--accent); }
+
+        .theme-btn {
+            background: none; border: 2px solid var(--accent); color: var(--text-color);
+            padding: 8px 12px; border-radius: 20px; cursor: pointer;
+            font-size: 1rem; display: flex; align-items: center; gap: 5px;
+            transition: var(--transition);
+        }
+        .theme-btn:hover { background: var(--accent); color: white; }
+
+        .hamburger { display: none; font-size: 1.5rem; cursor: pointer; color: var(--text-color); }
+
+        /* HERO */
+        .hero {
+            background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('Image/IMG-20251126-WA0034.jpg');
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+            height: 100vh; display: flex; align-items: center; text-align: center;
+            position: relative; transition: background-image 1.5s ease-in-out;
+        }
+        .hero-content { position: relative; z-index: 2; max-width: 800px; margin: 0 auto; }
+        .hero h1 { font-size: 3.5rem; margin-bottom: 20px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .hero p { font-size: 1.2rem; margin-bottom: 30px; color: #f0f0f0; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        
+        .btn {
+            display: inline-block; padding: 12px 30px; background-color: var(--accent);
+            color: white; border: none; border-radius: var(--border-radius); font-weight: 600;
+            text-decoration: none; cursor: pointer; transition: var(--transition); margin: 5px;
+        }
+        .btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+        .btn-outline { background-color: transparent; border: 2px solid var(--accent); color: var(--accent); }
+        .btn-outline:hover { background-color: var(--accent); color: white; }
+
+        section { padding: 80px 0; }
+        .section-title { text-align: center; margin-bottom: 50px; }
+        .section-title h2 { font-size: 2.5rem; margin-bottom: 15px; color: var(--text-color); }
+        .section-title p { color: var(--gray-text); max-width: 600px; margin: 0 auto; }
+
+        /* PREVIEW GRID */
+        .style-btns { text-align: center; margin-bottom: 30px; display: flex; justify-content: center; gap: 20px; }
+        .type-btn {
+            padding: 12px 25px; background: transparent; border: 2px solid var(--accent);
+            color: var(--text-color); border-radius: var(--border-radius); cursor: pointer;
+            font-weight: 600; transition: 0.3s;
+        }
+        .type-btn.active, .type-btn:hover { background: var(--accent); color: white; }
+
+        .preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        .preview-card {
+            background-color: var(--card-bg); border-radius: 12px; padding: 15px;
+            text-align: center; box-shadow: var(--shadow); transition: 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+        .preview-card img { width: 100%; border-radius: 10px; margin-bottom: 10px; }
+        .preview-card h3 { font-size: 1.1rem; margin-bottom: 5px; color: var(--text-color); }
+        .preview-card .price { font-size: 1rem; color: var(--accent); font-weight: 600; }
+
+        /* CUSTOMIZATION */
+        .customization-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+        .option-group {
+            background-color: var(--card-bg); padding: 25px; border-radius: var(--border-radius);
+            margin-bottom: 20px; border: 1px solid var(--border-color);
+        }
+        .option-group h3 { margin-bottom: 20px; color: var(--accent); }
+        .option-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+        .option-btn {
+            padding: 10px 20px; background-color: var(--input-bg); border: 1px solid var(--border-color);
+            border-radius: var(--border-radius); color: var(--text-color); cursor: pointer; transition: var(--transition);
+        }
+        .option-btn:hover, .option-btn.active { background-color: var(--accent); color: white; border-color: var(--accent); }
+
+        .upload-area {
+            border: 2px dashed var(--border-color); border-radius: var(--border-radius);
+            padding: 40px 20px; text-align: center; cursor: pointer; transition: var(--transition);
+            background-color: var(--input-bg); color: var(--text-color);
+        }
+        .upload-area:hover { border-color: var(--accent); }
+        .upload-area i { font-size: 3rem; margin-bottom: 15px; color: var(--accent); }
+
+        /* PRICE SUMMARY BOX */
+.price-summary {
+    background: var(--input-bg);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 16px;
+    margin-left:20px;
+    margin-right:20px;
+    margin-top: 20px;
+    max-width: 400px;
+    font-family: Arial, sans-serif;
+}
+
+/* EACH ROW */
+.price-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+/* TOTAL SECTION */
+.price-total {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid var(--accent);
+    margin-top: 10px;
+    padding-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+@media (max-width: 480px) {
+    .price-summary {
+        max-width: 100%;
+        padding: 14px;
+        font-size: 14px;
+    }
+
+    .price-item,
+    .price-total {
+        font-size: 14px;
+    }
+}
+    .price-summary span:last-child {
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.price-summary span.price-animate {
+    transform: scale(1.1);
+    color: #27ae60;
+}
+    /* COUPON BOX - UPDATED */
+.coupon-box {
+    display: ;
+    gap: 12px;
+    margin: 20px;
+    align-items: center;
+    background: var(--input-bg);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    max-width: 400px;
+}
+
+.coupon-box input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+    width:100%;
+}
+
+.coupon-box input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.2);
+}
+
+.coupon-box button {
+    padding: 10px 20px;
+    margin-top:10px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.coupon-box button:hover {
+    background: #d35400;
+    transform: translateY(-2px);
+}
+
+.coupon-box button:active {
+    transform: translateY(0);
+}
+
+#couponMsg {
+    font-size: 13px;
+    margin-top: 5px;
+    margin-left: 20px;
+}
+
+/* Coupon applied message */
+.coupon-success {
+    color: #27ae60;
+}
+
+.coupon-error {
+    color: #e74c3c;
+}
+    
+        /* CHECKOUT */
+        .checkout-container { display: grid; grid-template-columns: 1fr 1fr; gap: 0px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-color); }
+        .form-control {
+            width: 100%; padding: 12px 15px; background-color: var(--input-bg);
+            border: 1px solid var(--border-color); border-radius: var(--border-radius);
+            color: var(--text-color); font-family: 'Inter', sans-serif;
+        }
+        .form-control:focus { outline: none; border-color: var(--accent); }
+
+        .email-status { padding: 10px; margin: 10px 0; border-radius: 5px; text-align: center; }
+        .email-success { background-color: #d4edda; color: #155724; }
+        .email-error { background-color: #f8d7da; color: #721c24; }
+        .email-pending { background-color: #cce7ff; color: #004085; }
+        .email-warning { background-color: #fff3cd; color: #856404; }
+
+        .loading-spinner {
+            display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--accent); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-right: 10px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* ARTIST & FOOTER */
+        .artist-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+        .artist-image img { width: 100%; border-radius: 50%; box-shadow: var(--shadow); }
+        .artist-info h3 { font-size: 2rem; margin-bottom: 10px; color: var(--accent); }
+        .artist-role { color: var(--gray-text); font-style: italic; margin-bottom: 20px; }
+        .artist-info p { margin-bottom: 15px; color: var(--text-color); }
+
+        footer { background-color: #0f0b00; padding: 60px 0 30px; color: #f5f5f5; }
+        body.light-theme footer { background-color: #1a1a1a; }
+        .footer-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px; }
+        .footer-logo { font-size: 1.8rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .social-links { display: flex; gap: 15px; }
+        .social-links a {
+            display: flex; align-items: center; justify-content: center; width: 40px; height: 40px;
+            background-color: rgba(255, 255, 255, 0.1); border-radius: 50%; color: white; transition: var(--transition);
+        }
+        .social-links a:hover { background-color: var(--accent); transform: translateY(-3px); }
+        .footer-links a { color: #aaaaaa; text-decoration: none; transition: var(--transition); }
+        .footer-links a:hover { color: var(--accent); padding-left: 5px; }
+        .copyright { text-align: center; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #aaaaaa; font-size: 0.9rem; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none; position: fixed; top: 70px; right: 0; width: 70%;
+                height: calc(100vh - 70px); background-color: var(--card-bg);
+                flex-direction: column; padding: 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+                border-left: 1px solid var(--border-color); z-index: 1000; overflow-y: auto;
+                transition: transform 0.3s ease; transform: translateX(100%); align-items: flex-start;
+            }
+            .nav-menu.active { display: flex; transform: translateX(0); }
+            .nav-menu a { padding: 15px 0; border-bottom: 1px solid var(--border-color); width: 100%; font-size: 1.1rem; text-align: left; }
+            .hamburger { display: block; }
+            .hero h1 { font-size: 2.2rem; }
+            .artist-container, .customization-container, .checkout-container { grid-template-columns: 1fr; }
+        }
+        #mobile-menu-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); z-index: 999; backdrop-filter: blur(2px); display: none;
+        }
+        #mobile-menu-overlay.active { display: block; }
+        .hidden { display: none; }
+    .info-icon {
+  float: right;
+  font-size: 12px;
+  
+}
+    /* Update this existing class to align the icon and text */
+.option-group h3 {
+    display: flex;              /* Enables flexbox layout */
+    justify-content: space-between; /* Text on left, Icon on right */
+    align-items: center;        /* Vertically centers them */
+    margin-bottom: 20px; 
+    color: var(--accent);
+}
+
+/* Add this new style for the Info Icon Button */
+#openModalBtn {
+    cursor: pointer;
+    font-size: 1.2rem;          /* Icon size */
+    color: var(--text-color);   /* Default color */
+    opacity: 0.7;               /* Slightly dimmed by default */
+    transition: all 0.3s ease;  /* Smooth animation */
+    padding: 5px;               /* Adds a clickable area buffer */
+    border-radius: 50%;         /* Circular hover effect background */
+}
+
+/* Hover Effect */
+#openModalBtn:hover {
+    opacity: 1;                 /* Fully visible */
+    color: var(--accent);       /* Changes to orange/accent color */
+    background-color: rgba(255, 255, 255, 0.1); /* Subtle background glow */
+    transform: scale(1.1);      /* Slight zoom effect */
+}
+/* --- MODAL IMAGE STYLING --- */
+.app-dialog-content img {
+    width: 100%;             /* Fills the width of the modal */
+    height: auto;            /* Keeps the image proportion correct */
+    max-height: 200px;       /* Reduced height slightly so text is visible without too much scrolling */
+    object-fit: cover;       /* Crops the image neatly */
+    border-radius: 8px;      
+    margin-bottom: 15px;     
+    display: block;          
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+}
+
+    /* --- SCROLLABLE AREA & SPACING --- */
+.modal-scroll-area {
+    overflow-y: auto;   
+    padding-right: 10px; /* Space for scrollbar */
+    max-height: 60vh;    /* Ensure inner content scrolls */
+}
+
+/* Scrollbar styling for Chrome/Safari */
+.modal-scroll-area::-webkit-scrollbar { width: 6px; }
+.modal-scroll-area::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 4px; }
+
+/* Blocks for each size item */
+.content-block {
+    margin-bottom: 25px; 
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee; 
+}
+
+.content-block:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.content-block h3 {
+    font-size: 1.2rem;
+    color: var(--accent);
+    margin-top: 0;
+}
+
+.content-block p {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+/* Apply style to Size, Frame, and Finish info buttons */
+#openModalBtn, #openFrameModalBtn, #openFinishModalBtn {
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    padding: 5px;
+    border-radius: 50%;
+}
+
+/* Hover effects for all */
+#openModalBtn:hover, #openFrameModalBtn:hover, #openFinishModalBtn:hover {
+    opacity: 1;
+    color: var(--accent);
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+/* ORDER COMPLETED CONFIRMATION */
+/* Find this existing class and update it */
+.order-completed-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--card-bg);
+    border: 2px solid var(--accent);
+    border-radius: 12px;
+    padding: 30px;
+    z-index: 10000;
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: none;
+
+    /* --- ADD THESE LINES BELOW --- */
+    max-height: 80vh;  /* Limits height to 80% of screen */
+    overflow-y: auto;  /* Adds a scrollbar inside if content is too long */
+}
+
+.order-completed-popup.active {
+    display: block;
+}
+
+.order-completed-popup i {
+    font-size: 4rem;
+    color: #27ae60;
+    margin-bottom: 20px;
+}
+
+.order-completed-popup h2 {
+    color: var(--accent);
+    margin-bottom: 15px;
+}
+
+.order-completed-popup p {
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+.order-completed-popup .btn {
+    margin: 10px;
+}
+
+.order-completed-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    z-index: 9999;
+    display: none;
+}
+
+.order-completed-overlay.active {
+    display: block;
+}
+/* Find this block in your <style> and update the margin */
+.old-price {
+    text-decoration: line-through;
+    color: #888;
+    font-size: 0.9rem;
+    
+    /* CHANGE THIS LINE (Increase from 8px to 15px or 20px) */
+    margin-right: 15px; 
+}
+
+.new-price {
+    color: #E67E22; 
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+
+    </style>
+</head>
+<body class="">
+
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <img src="Image/logo.png" style="height:40px; width:40px; border-radius:50px;">
+                <span>MagicalArts</span>
+                
+            </a>
+            <button id="theme-toggle" class="theme-btn">
+                    <i class="fas fa-moon"></i> 
+                </button>
+            <nav class="nav-menu">
+                <a href="gallery.html">Gallery</a>
+                <a href="#customization">Customize</a>
+                <a href="contact.html">contact us</a>
+                <a href="#checkout">Order</a>
+                <a href="#cofounder">co-founder</a>
+                <a href="#founder">founder</a>
+                
+            </nav>
+            <div class="hamburger"><i class="fas fa-bars"></i></div>
+        </div>
+    </header>
+
+    <!-- Order Completion Popup -->
+    <div class="order-completed-overlay" id="orderCompletedOverlay"></div>
+    <div class="order-completed-popup" id="orderCompletedPopup">
+        <i class="fas fa-check-circle"></i>
+        <h2>🎉 Order Completed Successfully! 🎉</h2>
+        <p>Thank you for your order! Your custom painting is now being processed.</p>
+        
+        <p><strong>What happens next:</strong></p>
+        <ul style="text-align: left; margin: 15px 0; padding-left: 20px;">
+            <li>✅ Order confirmation has been sent to your email</li>
+            <li style="color:red;">✅ All paintings are on prepaid basis only, and preparation will commence upon payment.</li>
+            <li>✅ our team contact to soon.... </li>
+            <li>✅ If you want your painting quickly, our team will contact you through our customer care, and they will take care of the payment details.</li>
+           
+           <li>✅ our will finished with in 7 or 10days </li>
+           
+            <li>✅ Join our channel for exclusive art updates</li>
+        </ul>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+            
+            <button class="btn" onclick="window.open('https://whatsapp.com/channel/0029VbBcStfHgZWafZuurC2h', '_blank')" style="width:100%; background-color: #25D366; border:none;">
+                <i class="fab fa-whatsapp"></i> Join WhatsApp Channel
+            </button>
+
+            <button class="btn btn-outline" onclick="closeOrderCompleted()" style="width:100%;">
+                Continue Browsing
+            </button>
+            
+        </div>
+    </div>
+
+
+    <section class="hero" id="hero-section">
+        <div class="container hero-content">
+            <h1>Transform Your Vision Into Art</h1>
+            <p>Commission bespoke paintings that capture your unique style and transform your space</p>
+            <div class="hero-buttons">
+                <a href="gallery.html" class="btn">Browse Gallery</a>
+                <a href="#customization" class="btn btn-outline">Start Customizing</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="drawing-preview">
+        <div class="container">
+            <div class="section-title">
+                <h2>Drawing Style Preview</h2>
+                <p>Click a style to view sample drawing results</p>
+            </div>
+            <div class="style-btns">
+                <button class="type-btn active" data-type="color">Colour Drawing</button>
+                <button class="type-btn" data-type="pencil">Pencil Drawing</button>
+            </div>
+            <div class="preview-grid" id="preview-grid"></div>
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="gallery.html" class="btn">Explore More Art →</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="customization">
+        <div class="container">
+            <div class="section-title">
+                <h2>Customization Studio</h2>
+                <p>Create your perfect artwork with our easy customization options</p>
+            </div>
+            <div class="customization-container">
+                <div class="customization-options">
+
+                    <div class="option-group">
+                        <h3>Drawing Type</h3>
+                        <div class="option-buttons">
+                            <button class="option-btn">Black & White<br><span style="margin-top:20px;">Rs:259</span></button>
+                            <button class="option-btn active">Color Drawing <br><span style="margin-top:20px;">Rs.529</span></button>
+                        </div>
+                    </div>
+                    <div class="option-group">
+    <h3>Select Size
+        <span id="openModalBtn" style="cursor:pointer;float:right;">
+            <i class="fa-solid fa-circle-info"></i>
+        </span>
+    </h3>
+    <div class="option-buttons">
+        <button class="option-btn" data-price="0">Small (A5)<br><span style="margin-top:20px;">Free</span></button>
+        <button class="option-btn active" data-price="10">Medium (A4)<br><span style="margin-top:20px;">Rs.10</span></button>
+        <button class="option-btn" data-price="15">Large (A3)<br><span style="margin-top:20px;">Rs.15</span></button>
+        <button class="option-btn" data-price="0">Custom Size</button>
+    </div>
+</div>
+                  <!-- NEW: Number of Persons Section -->
+<div class="option-group">
+    <h3>Number of Persons
+        <span id="openPersonsModalBtn" style="cursor:pointer;float:right;">
+            <i class="fa-solid fa-circle-info"></i>
+        </span>
+    </h3>
+    <div class="option-buttons" id="persons-buttons">
+        <button class="option-btn active" data-price="0" data-persons="1">
+            1 Person<br><span style="margin-top:20px;">Free</span>
+        </button>
+        <button class="option-btn" data-price="50" data-persons="2">
+            2 Persons<br><span style="margin-top:20px;">Rs.50</span>
+        </button>
+        <button class="option-btn" data-price="80" data-persons="3">
+            3 Persons<br><span style="margin-top:20px;">Rs.80</span>
+        </button>
+        <button class="option-btn" data-price="custom" data-persons="custom">
+            Custom<br><span style="margin-top:20px;">Contact Us</span>
+        </button>
+    </div>
+</div>
+<div id="myModal" class="app-dialog-overlay">
+    <div class="app-dialog-content">
+        
+        <span class="app-dialog-close-btn">&times;</span>
+        
+        <h2 style="text-align: center; margin-bottom: 20px;">Size Guide</h2>
+
+        <div class="modal-scroll-area">
+            
+            <div class="content-block">
+                <h3>Small (12"x16")</h3>
+                <img src="Image\sizeexample.jpg" alt="Small Size Preview">
+                <p><strong>Ideal for:</strong> Desks, shelves, or narrow wall spaces.</p>
+                <p><strong>Best Subject:</strong> Single person portraits or pet portraits (Head & Shoulders).</p>
+                <p><strong>Comparison:</strong> Roughly the size of an A3 paper.</p>
+            </div>
+
+            <div class="content-block">
+                <h3>Medium (18"x24")</h3>
+                <img src="Image\sizeexample.jpg" alt="Medium Size Preview">
+                <p><strong>Ideal for:</strong> Bedrooms, hallways, or office walls.</p>
+                <p><strong>Best Subject:</strong> Couples, half-body portraits, or detailed close-ups.</p>
+                <p><strong>Comparison:</strong> Our most popular standard poster size. Fits easily in most rooms.</p>
+                <p><h3>Extra:</h3>Rs.10</p>
+          
+            </div>
+
+            <div class="content-block">
+                <h3>Large (24"x36")</h3>
+                <img src="Image\sizeexample.jpg" alt="Large Size Preview">
+                <p><strong>Ideal for:</strong> Living rooms, main focal points, or above the sofa.</p>
+                <p><strong>Best Subject:</strong> Family portraits (3+ people), full-body sketches, or highly detailed scenery.</p>
+                <p><strong>Comparison:</strong> A true statement piece. Similar to a standard movie poster size.</p>
+                                <p><h3>Extra:</h3>Rs.15</p>
+          
+            </div>
+
+            <div class="content-block">
+                <h3>Custom Size</h3>
+                <img src="Image\sizeexample.jpg" alt="Custom Size Preview">
+                <p><strong>Need something specific?</strong></p>
+                <p>We can create artwork to fit specific frames or unique wall spaces.</p>
+                <p><em>Please select "Custom Size" and mention your dimensions in the 'Special Instructions' box at checkout.</em></p>
+                                <p><h3>Extra:</h3>we will contact soon</p>
+          
+            </div>
+
+        </div>
+    </div>
+</div>
+                    
+                    <!-- Persons Information Modal -->
+<div id="personsModal" class="app-dialog-overlay">
+    <div class="app-dialog-content">
+        <span class="app-dialog-close-btn">&times;</span>
+        
+        <h2 style="text-align: center; margin-bottom: 20px;">Number of Persons Guide</h2>
+
+        <div class="modal-scroll-area">
+            <div class="content-block">
+                <h3>1 Person</h3>
+                <img src="Image\exfoeperson1.jpg" alt="Single Portrait">
+                <p><strong>Ideal for:</strong> Individual portraits, pet drawings, or single subject artwork.</p>
+                <p><strong>Included:</strong> One main subject with detailed attention.</p>
+                <p><strong>Price:</strong> Free (included in base price)</p>
+            </div>
+
+            <div class="content-block">
+                <h3>2 Persons</h3>
+                <img src="Image\exfoeperson2.jpg" alt="Couple Portrait">
+                <p><strong>Ideal for:</strong> Couples, friends, siblings, or parent-child portraits.</p>
+                <p><strong>Included:</strong> Two subjects with balanced composition.</p>
+                <p><strong>Extra Charge:</strong> ₹50</p>
+            </div>
+
+            <div class="content-block">
+                <h3>3 Persons</h3>
+                <img src="Image\exfoeperson3.jpg" alt="Family Portrait">
+                <p><strong>Ideal for:</strong> Small families, group of friends, or team portraits.</p>
+                <p><strong>Included:</strong> Three subjects with detailed composition.</p>
+                <p><strong>Extra Charge:</strong> ₹80</p>
+            </div>
+
+            <div class="content-block">
+                <h3>Custom (4+ Persons)</h3>
+                <img src="https://via.placeholder.com/300x200?text=Large+Group" alt="Large Group">
+                <p><strong>Need more than 3 persons?</strong></p>
+                <p>We can create artwork for larger groups, families, or special occasions.</p>
+                <p><em>Please select "Custom" and mention the number of persons in the 'Special Instructions' box at checkout. We'll contact you with a custom quote.</em></p>
+                <p><strong>Price:</strong> Custom quote based on requirements</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- REMOVED FRAME AND FINISH SECTIONS -->
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+    
+<div class="price-summary">
+    <div class="price-item"><span>Base Price</span><span>₹0</span></div>
+    <div class="price-item"><span>Size</span><span>₹0</span></div>
+    <div class="price-item"><span>Persons</span><span>₹0</span></div>
+    <div class="price-item"><span>Shipping</span><span>₹0</span></div>
+    <div class="price-item"><span>Discount</span><span>-₹0</span></div>
+
+    <div class="price-total">
+        <span>Total</span>
+        <span>₹0</span>
+    </div>
+</div>
+
+<!-- UPDATED COUPON SECTION -->
+<div class="coupon-box">
+    <input type="text" id="couponInput" placeholder="Enter coupon code (e.g., NEW10)">
+    <button id="applyCouponBtn">Apply Coupon</button>
+</div>
+<p id="couponMsg"></p>
+
+    <section id="checkout">
+        <div class="container">
+            <div class="section-title">
+                <h2>Complete Your Order</h2>
+                <p>Fill in your details to place your custom painting order</p>
+            </div>
+            <div class="checkout-container">
+                <div class="checkout-form">
+                    <h3 style="margin-bottom: 20px; color: var(--accent);">Shipping Information</h3>
+                    <form id="upload-form">
+                        <div class="form-group">
+                            <label for="customer-name">Full Name *</label>
+                            <input type="text" id="customer-name" class="form-control" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customer-email">Email Address *</label>
+                            <input type="email" id="customer-email" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customer-phone">Phone Number *</label>
+                            <input type="tel" id="customer-phone" class="form-control" placeholder="Enter your phone number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="customer-address">Shipping Address</label>
+                            <textarea id="customer-address" class="form-control" rows="1" placeholder="Enter your complete address (optional)" ></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="instructions">Special Instructions</label>
+                            <textarea id="instructions" class="form-control" rows="1" placeholder="Any special requests (optional)"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox" id="send-email" checked>
+                                <span>Send order confirmation via Email</span>
+                            </label>
+                        </div>
+<div id="email-status-container" style="display: none;"></div>
+                        <div class="loading-spinner hidden" id="loading-spinner"></div>
+                        <button type="submit" id="submit-btn" class="btn" style="width: 100%;">Place Order</button>
+                        
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about-artist">
+        <div class="container" id="founder">
+            <div class="section-title"><h2>About the Artist & Founder</h2></div>
+            <div class="artist-container">
+                <div class="artist-image">
+                    <img src="Image/artist.jpg" alt="Lingesh" onerror="this.src='https://via.placeholder.com/400'">
+                </div>
+                <div class="artist-info">
+                    <h3>Lingesh</h3>
+                    <p class="artist-role">Founder • Lead Artist</p>
+                    <p>Specializing in pencil sketches and color portraits, Lingesh transforms ordinary photographs into timeless masterpieces.</p>
+                     <a href="gallery.html" class="btn">My works</a>
+                
+                </div>
+            </div>
+            <hr style="margin: 40px 0; border-color: var(--border-color);" id="cofounder" >
+            <div class="section-title"><h2>About the Co-Founder</h2><p>Web Developer & Designer</p></div>
+            <div class="artist-container">
+                <div class="artist-image">
+                    <img src="Image/co-founderimage.jpg" alt="Prasanth" onerror="this.src='https://via.placeholder.com/400'">
+                </div>
+                <div class="artist-info">
+                    <h3>Prasanth</h3>
+                    <p class="artist-role">Co-Founder • Digital Creator</p>
+                    <p>A passionate web developer specializing in creating responsive, user-friendly websites.</p>
+                    <a href="https://prasanth781007.github.io/Portfolio-/project%20.html" class="btn">My works</a>
+                
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-about">
+                    <div class="footer-logo">
+                        <img src="Image/logo.png" style="height:40px; width:40px; border-radius:50px;">
+                        <span>MagicalArts</span>
+                    </div>
+                    <p>Transforming visions into timeless artwork since 2025.</p>
+                    <div class="social-links">
+                        <a href="https://www.instagram.com/magicalarts18"><i class="fab fa-instagram"></i></a>
+                        <a href="https://whatsapp.com/channel/0029VbBcStfHgZWafZuurC2h"><i class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.linkedin.com/in/prasanth-k-741b64381"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="#customization">Customization</a></li>
+                        <li><a href="contact.html">contact us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-phone"></i> +91 82486 78722</p>
+                    <p><i class="fas fa-envelope"></i> magicalarts18@gmail.com</p>
+                </div>
+            </div>
+            <div class="copyright"><p>&copy;2025 All rights reserved. Created by <a href="#cofounder" style="color:var(--accent);">Prasanth</a></p></div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <script>
+// =========================
+// GLOBAL CONFIGURATIONS
+// =========================
+const EMAIL_CONFIG = {
+    serviceId: "service_haqeiln",
+    templateId: "template_lokyfvm",
+    publicKey: "6N_lqIvH8QuvPEEbT"
+};
+
+const BUSINESS_EMAIL = "magicalarts18@gmail.com";
+const WHATSAPP_NUMBER = "917810078875";
+
+// Coupons configuration
+const coupons = {
+    YEAR_OFF10: { type: 'percent', value: 10 },
+    FLAT50: { type: 'flat', value: 10 },
+    MAGICAL18: { type: 'flat', value: 20 },
+    PRASANTH: { type: 'flat', value: 35 },
+};
+
+let appliedCoupon = null;
+
+// =========================
+// MODAL SETUP
+// =========================
+document.addEventListener('DOMContentLoaded', () => {
+    
+    function setupModal(modalId, btnId) {
+        const modal = document.getElementById(modalId);
+        const btn = document.getElementById(btnId);
+        const closeBtn = modal ? modal.querySelector('.app-dialog-close-btn') : null;
+
+        if (modal && btn && closeBtn) {
+            btn.onclick = () => modal.style.display = 'block';
+            closeBtn.onclick = () => modal.style.display = 'none';
+        }
+    }
+
+    // Setup both modals
+    setupModal('myModal', 'openModalBtn');
+    setupModal('personsModal', 'openPersonsModalBtn');
+
+    window.onclick = function(event) {
+        if (event.target.classList.contains('app-dialog-overlay')) {
+            event.target.style.display = 'none';
+        }
+    }
+});
+
+// =========================
+// ORDER COMPLETION POPUP FUNCTIONS
+// =========================
+function showOrderCompleted() {
+    document.getElementById('orderCompletedPopup').classList.add('active');
+    document.getElementById('orderCompletedOverlay').classList.add('active');
+    // FREEZE BACKGROUND SCROLLING
+    document.body.style.overflow = 'hidden'; 
+}
+
+function closeOrderCompleted() {
+    document.getElementById('orderCompletedPopup').classList.remove('active');
+    document.getElementById('orderCompletedOverlay').classList.remove('active');
+    // ENABLE BACKGROUND SCROLLING AGAIN
+    document.body.style.overflow = ''; 
+}
+
+// =========================
+// INITIALIZE EMAILJS
+// =========================
+(function() {
+    emailjs.init(EMAIL_CONFIG.publicKey);
+    console.log("✓ EmailJS initialized");
+})();
+
+// =========================
+// HERO SLIDESHOW
+// =========================
+document.addEventListener("DOMContentLoaded", function () {
+    const heroImages = [
+        "Image/IMG-20251126-WA0034.jpg",
+        "Image/IMG-20251126-WA0032.jpg",
+        "Image/IMG-20251126-WA0039.jpg",
+        "Image/IMG-20251126-WA0028.jpg"
+    ];
+    let currentIndex = 0;
+    const heroSection = document.getElementById("hero-section");
+    if(heroSection) {
+        function changeHeroBackground() {
+            const nextImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${heroImages[currentIndex]}')`;
+            heroSection.style.backgroundImage = nextImage;
+            currentIndex = (currentIndex + 1) % heroImages.length;
+        }
+        changeHeroBackground();
+        setInterval(changeHeroBackground, 5000);
+    }
+});
+
+// =========================
+// DRAWING PREVIEW DATA (UPDATED WITH MRP)
+// =========================
+const drawingSamples = {
+    pencil: [
+    { img: "exfoeperson1.jpg", title: "Realistic Pencil Portrait", mrp: 400, price: 250 },
+       
+        { img: "pencil5.jpg", title: "Realistic Pencil Portrait", mrp: 400, price: 250 },
+        { img: "pencil6.jpg", title: "Hand-Shaded Sketch", mrp: 350, price: 200 },
+        { img: "pencil1.jpg", title: "Charcoal Finish", mrp: 350, price: 200 },
+        { img: "pencil2.jpg", title: "Detailed Sketch", mrp: 350, price: 200 }
+    ],
+    color: [
+        { img: "IMG-20251126-WA0034.jpg", title: "Vibrant Color Portrait", mrp: 600, price: 499 },
+        { img: "IMG-20251126-WA0039.jpg", title: "Digital Color Artwork", mrp: 550, price: 489 },
+        { img: "color3.jpg", title: "Oil Paint Effect", mrp: 700, price: 589 },
+        { img: "IMG-20251126-WA0031.jpg", title: "Soft Tone Art", mrp: 550, price: 489 },
+        { img: "IMG-20251126-WA0032.jpg", title: "Classic Color", mrp: 550, price: 489 }
+    ]
+};
+
+function loadImages(type) {
+    const grid = document.getElementById("preview-grid");
+    if (!grid) return;
+    grid.innerHTML = "";
+    
+    (drawingSamples[type] || []).forEach(item => {
+        const card = document.createElement("div");
+        card.classList.add("preview-card");
+        
+        // Updated HTML to show MRP and Offer Price
+        card.innerHTML = `
+            <img src="Image/${item.img}" onerror="this.src='https://via.placeholder.com/300x400?text=${type}+Art'" alt="${item.title}">
+            <h3>${item.title}</h3>
+            <div class="price-container" style="margin-top: 5px;">
+                MRP:<span class="old-price">₹${item.mrp}</span>
+                <span class="new-price">Price:₹${item.price}</span>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+loadImages("color");
+document.querySelectorAll(".type-btn").forEach(btn => {
+    btn.addEventListener("click", function() {
+        document.querySelectorAll(".type-btn").forEach(b => b.classList.remove("active"));
+        this.classList.add("active");
+        loadImages(this.dataset.type);
+    });
+});
+
+// =========================
+// THEME TOGGLE
+// =========================
+const themeBtn = document.getElementById('theme-toggle');
+const themeIcon = themeBtn ? themeBtn.querySelector('i') : null;
+const body = document.body;
+
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'light') {
+    body.classList.add('light-theme');
+    updateThemeBtn('light');
+} else {
+    updateThemeBtn('dark');
+}
+
+themeBtn.addEventListener('click', () => {
+    body.classList.toggle('light-theme');
+    const isLight = body.classList.contains('light-theme');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    updateThemeBtn(isLight ? 'light' : 'dark');
+});
+
+function updateThemeBtn(mode) {
+    if (!themeIcon) return;
+    if (mode === 'light') {
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+    } else {
+        themeIcon.classList.remove('fa-sun');
+        themeIcon.classList.add('fa-moon');
+    }
+}
+
+// =========================
+// PRICE CALCULATION - UPDATED WITH PERSONS
+// =========================
+function calculatePrice() {
+    // DRAWING TYPE - LOGICAL PRICES
+    const drawingBtn = document.querySelector(
+        '.customization-options .option-group:nth-of-type(1) .option-btn.active'
+    );
+    
+    // Updated logical prices
+    let basePrice = 259; // Pencil drawing base price
+    if (drawingBtn && drawingBtn.textContent.includes('Color')) {
+        basePrice = 499; // Color drawing base price
+    }
+
+    // SIZE
+    const sizeBtn = document.querySelector(
+        '.customization-options .option-group:nth-of-type(2) .option-btn.active'
+    );
+    const sizePrice = sizeBtn ? parseInt(sizeBtn.dataset.price || 0) : 0;
+
+    // PERSONS (NEW)
+    const personsBtn = document.querySelector(
+        '.customization-options .option-group:nth-of-type(3) .option-btn.active'
+    );
+    let personsPrice = 0;
+    if (personsBtn && personsBtn.dataset.price !== 'custom') {
+        personsPrice = parseInt(personsBtn.dataset.price || 0);
+    }
+
+    // SHIPPING (updated to reasonable value)
+    const shipping = 0;
+
+    const subtotal = basePrice + sizePrice + personsPrice + shipping;
+
+    // DISCOUNT
+    let discount = 0;
+    if (appliedCoupon) {
+        if (appliedCoupon.type === 'percent') {
+            discount = Math.round(subtotal * appliedCoupon.value / 100);
+        } else if (appliedCoupon.type === 'flat') {
+            discount = appliedCoupon.value;
+        }
+    }
+
+    const total = Math.max(subtotal - discount, 0);
+
+    return {
+        base: basePrice,
+        size: sizePrice,
+        persons: personsPrice,
+        shipping: shipping,
+        discount: discount,
+        total: total
+    };
+}
+
+// =========================
+// UPDATE PRICE UI - UPDATED
+// =========================
+function updatePriceUI() {
+    const p = calculatePrice();
+    const summary = document.querySelector('.price-summary');
+    if (!summary) return;
+
+    const items = summary.querySelectorAll('.price-item span:last-child');
+    if (items.length >= 5) {
+        items[0].textContent = `₹${p.base}`;
+        items[1].textContent = `₹${p.size}`;
+        items[2].textContent = `₹${p.persons}`;
+        items[3].textContent = `₹${p.shipping}`;
+        items[4].textContent = `-₹${p.discount}`;
+    }
+
+    summary.querySelector('.price-total span:last-child').textContent = `₹${p.total}`;
+}
+
+// =========================
+// OPTION BUTTONS HANDLER (UPDATED FOR ALL OPTION GROUPS)
+// =========================
+document.querySelectorAll('.option-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+        const group = this.closest('.option-buttons');
+        group.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        updatePriceUI();
+    });
+});
+
+// =========================
+// COUPON APPLICATION
+// =========================
+document.getElementById('applyCouponBtn')?.addEventListener('click', () => {
+    const input = document.getElementById('couponInput');
+    const msg = document.getElementById('couponMsg');
+
+    const code = input.value.trim().toUpperCase();
+
+    if (coupons[code]) {
+        appliedCoupon = coupons[code];
+        msg.textContent = `✓ Coupon "${code}" applied successfully!`;
+        msg.className = 'coupon-success';
+    } else {
+        appliedCoupon = null;
+        msg.textContent = '✗ Invalid coupon code. Try NEW10 or FLAT50';
+        msg.className = 'coupon-error';
+    }
+
+    updatePriceUI();
+});
+
+// =========================
+// GET ORDER DETAILS - UPDATED WITH PERSONS
+// =========================
+function getOrderDetails() {
+    const p = calculatePrice();
+    
+    const getActiveBtnText = (groupIndex) => {
+        const el = document.querySelector(`.customization-options .option-group:nth-of-type(${groupIndex}) .option-btn.active`);
+        return el ? el.textContent.trim() : 'N/A';
+    };
+
+    const getPersonsCount = () => {
+        const personsBtn = document.querySelector('.customization-options .option-group:nth-of-type(3) .option-btn.active');
+        if (!personsBtn) return '1 Person';
+        
+        if (personsBtn.dataset.persons === 'custom') {
+            return 'Custom (Contact for quote)';
+        }
+        return personsBtn.textContent.split('<')[0].trim();
+    };
+
+    return {
+        name: document.getElementById('customer-name').value,
+        email: document.getElementById('customer-email').value,
+        phone: document.getElementById('customer-phone').value,
+        address: document.getElementById('customer-address').value,
+        instructions: document.getElementById('instructions').value,
+        style: getActiveBtnText(1),
+        size: getActiveBtnText(2),
+        persons: getPersonsCount(),
+        price: p
+    };
+}
+
+// =========================
+// WHATSAPP FUNCTION - UPDATED WITH PERSONS
+// =========================
+function sendOrderViaWhatsApp() {
+    const d = getOrderDetails();
+    const message = `🎨 *NEW CUSTOM ORDER* 🎨%0A%0A` +
+        `*Name:* ${d.name}%0A` +
+        `*Email:* ${d.email}%0A` +
+        `*Phone:* ${d.phone}%0A` +
+        `*Address:* ${d.address}%0A%0A` +
+        `*ORDER DETAILS:*%0A` +
+        `Style: ${d.style}%0A` +
+        `Size: ${d.size}%0A` +
+        `Persons: ${d.persons}%0A` +
+        `Instructions: ${d.instructions || 'None'}%0A%0A` +
+        `*PRICE BREAKDOWN:*%0A` +
+        `Base: ₹${d.price.base}%0A` +
+        `Size: ₹${d.price.size}%0A` +
+        `Persons: ₹${d.price.persons}%0A` +
+        `Shipping: ₹${d.price.shipping}%0A` +
+        `Discount: -₹${d.price.discount}%0A` +
+        `*TOTAL: ₹${d.price.total}*`;
+    
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+    window.open(url, '_blank');
+}
+
+// =========================
+// EMAIL FUNCTION - UPDATED WITH PERSONS
+// =========================
+async function sendOrderViaEmail() {
+    const d = getOrderDetails();
+    
+    const now = new Date();
+    const orderDate = now.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    const orderId = 'MA' + Date.now().toString().slice(-6);
+    
+    const templateParams = {
+        customer_name: d.name || 'Customer',
+        customer_email: d.email || 'No email',
+        customer_phone: d.phone || 'No phone',
+        customer_address: d.address || 'No address',
+        drawing_type: d.style || 'Color Drawing',
+        size: d.size || 'Medium (A4)',
+        number_of_persons: d.persons || '1 Person',
+        instructions: d.instructions || 'No special instructions',
+        base_price: d.price.base || 529,
+        size_price: d.price.size || 10,
+        persons_price: d.price.persons || 0,
+        shipping_price: d.price.shipping || 0,
+        discount: d.price.discount || 0,
+        total_price: d.price.total,
+        order_date: orderDate,
+        order_id: orderId,
+        business_email_to: BUSINESS_EMAIL,
+        customer_email_to: d.email || 'No email'
+    };
+    
+    console.log("📧 Sending email with:", templateParams);
+    
+    try {
+        const response = await emailjs.send(
+            EMAIL_CONFIG.serviceId,
+            EMAIL_CONFIG.templateId,
+            templateParams
+        );
+        console.log("✅ Email sent successfully!");
+        return response;
+    } catch (error) {
+        console.error("❌ EmailJS Error:", error);
+        throw error;
+    }
+}
+
+// =========================
+// FORM SUBMISSION
+// =========================
+const uploadForm = document.getElementById('upload-form');
+const spinner = document.getElementById('loading-spinner');
+const statusDiv = document.getElementById('email-status-container');
+const submitBtn = document.getElementById('submit-btn');
+if(uploadForm) {
+    uploadForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Validation
+        const name = document.getElementById('customer-name').value.trim();
+        const email = document.getElementById('customer-email').value.trim();
+        const phone = document.getElementById('customer-phone').value.trim();
+        
+        if(!name || !email || !phone) {
+            alert("Please fill in all required fields: Name, Email, and Phone");
+            return;
+        }
+        
+        // Check if custom persons is selected without instructions
+        const personsBtn = document.querySelector('.customization-options .option-group:nth-of-type(3) .option-btn.active');
+        const instructions = document.getElementById('instructions').value.trim();
+        if (personsBtn && personsBtn.dataset.persons === 'custom' && !instructions) {
+            alert("Please mention the number of persons and details in the 'Special Instructions' box for custom person count.");
+            return;
+        }
+        
+        const emailChecked = document.getElementById('send-email').checked;
+        
+        // --- START LOADING ANIMATION ---
+        spinner.classList.remove('hidden'); // Shows the circle spinner
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Processing...';
+        statusDiv.style.display = 'none';
+        
+        try {
+            // 1. If sending email, show the "Spinning" icon text
+            if (emailChecked) {
+                statusDiv.innerHTML = '<div class="email-status email-pending"><i class="fas fa-spinner fa-spin"></i> Sending order confirmation...</div>';
+                statusDiv.style.display = "block";
+                
+                await sendOrderViaEmail();
+                
+                // This replaces the spinning icon with a checkmark so it STOPS spinning
+                statusDiv.innerHTML = '<div class="email-status email-success"><i class="fas fa-check"></i> Email Sent Successfully!</div>';
+            }
+            
+            // 2. Always send to WhatsApp
+            sendOrderViaWhatsApp();
+            
+            // 3. Show order completion popup
+            showOrderCompleted();
+            
+            // 4. Clear form and reset inputs
+            uploadForm.reset();
+            
+            // Reset option buttons to defaults
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                if (btn.textContent.includes('Color') && btn.closest('.option-group').querySelector('h3').textContent.includes('Drawing Type')) {
+                    btn.classList.add('active');
+                } else if (btn.textContent.includes('Medium') && btn.closest('.option-group').querySelector('h3').textContent.includes('Size')) {
+                    btn.classList.add('active');
+                } else if (btn.dataset.persons === '1' && btn.closest('.option-group').querySelector('h3').textContent.includes('Persons')) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            updatePriceUI();
+            
+            appliedCoupon = null;
+            document.getElementById('couponInput').value = '';
+            document.getElementById('couponMsg').textContent = '';
+            
+        } catch (err) {
+            console.error("Order submission error:", err);
+            
+            let errorMsg = "Email service temporarily unavailable.";
+            if (err.status === 400) {
+                errorMsg = "Email template error. Please contact support.";
+            } else if (err.status === 0) {
+                errorMsg = "Network error. Check your internet connection.";
+            }
+            
+            // If error, show error icon (no spin)
+            statusDiv.innerHTML = `
+                <div class="email-status email-error">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    <strong>${errorMsg}</strong><br>
+                    Order sent via WhatsApp only.
+                </div>
+            `;
+            statusDiv.style.display = "block";
+            
+            sendOrderViaWhatsApp();
+            
+        } finally {
+            // --- STOP LOADING ANIMATION ---
+            spinner.classList.add('hidden'); // Hides the circle spinner
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Place Order';
+        }
+    });
+}
+
+// =========================
+// MOBILE MENU
+// =========================
+const hamburger = document.querySelector('.hamburger');
+const navMenu = document.querySelector('.nav-menu');
+const overlay = document.createElement('div');
+overlay.id = 'mobile-menu-overlay';
+document.body.appendChild(overlay);
+
+function toggleMenu() {
+    navMenu.classList.toggle('active');
+    overlay.classList.toggle('active');
+    const icon = hamburger.querySelector('i');
+    if(navMenu.classList.contains('active')) {
+        icon.classList.remove('fa-bars'); 
+        icon.classList.add('fa-times');
+    } else {
+        icon.classList.remove('fa-times'); 
+        icon.classList.add('fa-bars');
+    }
+}
+
+if(hamburger) {
+    hamburger.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', toggleMenu);
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+        link.addEventListener('click', () => {
+            if(window.innerWidth <= 768) toggleMenu();
+        });
+    });
+}
+
+// Initial price update
+updatePriceUI();
+
+// =========================
+// PERSONS SELECTION VALIDATION
+// =========================
+function validatePersonsSelection() {
+    const personsBtn = document.querySelector('.customization-options .option-group:nth-of-type(3) .option-btn.active');
+    if (personsBtn && personsBtn.dataset.persons === 'custom') {
+        const instructions = document.getElementById('instructions').value.trim();
+        if (!instructions) {
+            alert("For custom number of persons, please mention details in the 'Special Instructions' box.");
+            return false;
+        }
+    }
+    return true;
+}
+    </script>
+
+</body>
+</html>
