@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MagicalArts Order Confirmation</title>
+    <style>
+        /* ── Reset ─────────────────────────────────── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f4f1ec;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #2c2c2c;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Wrapper ────────────────────────────────── */
+        .wrapper {
+            max-width: 620px;
+            margin: 30px auto;
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.10);
+        }
+
+        /* ── Header ─────────────────────────────────── */
+        .header {
+            background: linear-gradient(135deg, #1a0f00 0%, #3d1f00 60%, #E67E22 100%);
+            padding: 40px 36px 32px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            display: block;
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 28px;
+            background: #fff;
+            border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+        }
+
+        .header-logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .header-logo span {
+            color: #E67E22;
+        }
+
+        .header-tagline {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .header-icon {
+            font-size: 42px;
+            margin-bottom: 12px;
+        }
+
+        /* ── Hero Banner ─────────────────────────────── */
+        .hero-banner {
+            background: linear-gradient(135deg, #fff8f0, #fff3e6);
+            border-bottom: 2px solid #f5e0c8;
+            padding: 28px 36px;
+            text-align: center;
+        }
+
+        .hero-banner h1 {
+            font-size: 22px;
+            color: #1a0f00;
+            margin-bottom: 6px;
+        }
+
+        .hero-banner p {
+            color: #7a6652;
+            font-size: 14px;
+        }
+
+        .order-id-pill {
+            display: inline-block;
+            background: #E67E22;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 6px 20px;
+            border-radius: 50px;
+            margin-top: 14px;
+            letter-spacing: 1px;
+        }
+
+        /* ── Body ───────────────────────────────────── */
+        .body {
+            padding: 32px 36px;
+        }
+
+        .greeting {
+            font-size: 16px;
+            color: #1a0f00;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .greeting strong {
+            color: #E67E22;
+        }
+
+        /* ── Section Card ────────────────────────────── */
+        .section-card {
+            background: #fafafa;
+            border: 1px solid #ede8e2;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(90deg, #1a0f00, #3d1f00);
+            color: #E67E22;
+            padding: 11px 18px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .section-body {
+            padding: 18px;
+        }
+
+        /* ── Row inside card ─────────────────────────── */
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 9px 0;
+            border-bottom: 1px solid #ede8e2;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #9e8c7a;
+            font-weight: 600;
+            min-width: 140px;
+            font-size: 13px;
+        }
+
+        .info-value {
+            color: #2c2c2c;
+            font-weight: 500;
+            text-align: right;
+            flex: 1;
+        }
+
+        /* ── Price Breakdown ─────────────────────────── */
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #ede8e2;
+            font-size: 14px;
+            color: #6b5c4e;
+        }
+
+        .price-row:last-child {
+            border-bottom: none;
+        }
+
+        .price-total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 0 6px;
+            border-top: 2px solid #E67E22;
+            margin-top: 6px;
+            font-size: 18px;
+            font-weight: 800;
+            color: #1a0f00;
+        }
+
+        .price-total-row span:last-child {
+            color: #E67E22;
+        }
+
+        /* ── Notice Banner ───────────────────────────── */
+        .notice-banner {
+            background: linear-gradient(135deg, #fff8f0, #ffe8cc);
+            border: 1px solid #f5d5a8;
+            border-left: 4px solid #E67E22;
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin-bottom: 20px;
+            font-size: 13.5px;
+            color: #5c3d00;
+            line-height: 1.7;
+        }
+
+        .notice-banner strong {
+            color: #c0600a;
+        }
+
+        /* ── Track Order Button ──────────────────────── */
+        .track-btn-wrap {
+            text-align: center;
+            margin: 24px 0 16px;
+        }
+
+        .track-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #E67E22, #d35400);
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 14px 36px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 18px rgba(230, 126, 34, 0.4);
+        }
+
+        /* ── Steps ───────────────────────────────────── */
+        .steps-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .step-box {
+            flex: 1;
+            background: #fff8f0;
+            border: 1px solid #ede8e2;
+            border-radius: 10px;
+            padding: 14px 10px;
+        }
+
+        .step-icon {
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+
+        .step-label {
+            font-size: 11px;
+            color: #9e8c7a;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .step-text {
+            font-size: 12px;
+            color: #5c3d00;
+            margin-top: 4px;
+        }
+
+        /* ── Divider ─────────────────────────────────── */
+        .divider {
+            border: none;
+            border-top: 1px solid #ede8e2;
+            margin: 24px 0;
+        }
+
+        /* ── Footer ─────────────────────────────────── */
+        .footer {
+            background: #1a0f00;
+            padding: 28px 36px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .footer a {
+            color: #E67E22;
+            text-decoration: none;
+        }
+
+        .footer-logo {
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .footer-logo span {
+            color: #E67E22;
+        }
+
+        .social-links {
+            margin: 14px 0;
+        }
+
+        .social-links a {
+            display: inline-block;
+            margin: 0 8px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            color: #E67E22;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="wrapper">
+
+        <!-- ═══ HEADER ═══ -->
+        <div class="header">
+            <div class="header-icon">🎨</div>
+            <div class="header-logo">Magical<span>Arts</span></div>
+            <div class="header-tagline">Custom Painting Studio</div>
+        </div>
+
+        <!-- ═══ HERO ═══ -->
+        <div class="hero-banner">
+            <h1>🎉 Order Confirmed!</h1>
+            <p>Your custom painting request has been received. We'll start crafting your masterpiece soon.</p>
+            <div class="order-id-pill">Order ID: {{order_id}}</div>
+        </div>
+
+        <!-- ═══ BODY ═══ -->
+        <div class="body">
+
+            <p class="greeting">
+                Hi <strong>{{customer_name}}</strong>,<br><br>
+                Thank you for choosing MagicalArts! We're thrilled to create a beautiful custom painting just for you.
+                Here's a summary of your order:
+            </p>
+
+            <!-- ── Customer Info ── -->
+            <div class="section-card">
+                <div class="section-header">📦 Customer Details</div>
+                <div class="section-body">
+                    <div class="info-row">
+                        <span class="info-label">Full Name</span>
+                        <span class="info-value">{{customer_name}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Email</span>
+                        <span class="info-value">{{customer_email}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Phone</span>
+                        <span class="info-value">{{customer_phone}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Shipping Address</span>
+                        <span class="info-value">{{customer_address}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Order Details ── -->
+            <div class="section-card">
+                <div class="section-header">🖼️ Order Details</div>
+                <div class="section-body">
+                    <div class="info-row">
+                        <span class="info-label">Drawing Style</span>
+                        <span class="info-value">{{drawing_type}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Size</span>
+                        <span class="info-value">{{size}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">No. of Persons</span>
+                        <span class="info-value">{{number_of_persons}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Special Instructions</span>
+                        <span class="info-value">{{instructions}}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Order Date</span>
+                        <span class="info-value">{{order_date}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Price Breakdown ── -->
+            <div class="section-card">
+                <div class="section-header">💰 Price Breakdown</div>
+                <div class="section-body">
+                    <div class="price-row">
+                        <span>Base Price</span>
+                        <span>₹{{base_price}}</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Size Extra</span>
+                        <span>₹{{size_price}}</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Persons Extra</span>
+                        <span>₹{{persons_price}}</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Shipping</span>
+                        <span>₹{{shipping_price}}</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Discount</span>
+                        <span style="color:#27ae60;">- ₹{{discount}}</span>
+                    </div>
+                    <div class="price-total-row">
+                        <span>Total</span>
+                        <span>₹{{total_price}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Important Notice ── -->
+            <div class="notice-banner">
+                <strong>⚠️ Important:</strong> All paintings are on <strong>prepaid basis only</strong>.<br>
+                Preparation will begin only after payment is received.<br>
+                Our team will contact you soon with payment details.<br>
+                Your painting will be completed within <strong>7–10 working days</strong>.
+            </div>
+
+            <!-- ── What Happens Next ── -->
+            <div class="steps-row">
+                <div class="step-box">
+                    <div class="step-icon">✅</div>
+                    <div class="step-label">Step 1</div>
+                    <div class="step-text">Order Received</div>
+                </div>
+                <div class="step-box">
+                    <div class="step-icon">💳</div>
+                    <div class="step-label">Step 2</div>
+                    <div class="step-text">Payment Confirm</div>
+                </div>
+                <div class="step-box">
+                    <div class="step-icon">🎨</div>
+                    <div class="step-label">Step 3</div>
+                    <div class="step-text">We Create Art</div>
+                </div>
+                <div class="step-box">
+                    <div class="step-icon">🚚</div>
+                    <div class="step-label">Step 4</div>
+                    <div class="step-text">Delivered</div>
+                </div>
+            </div>
+
+            <!-- ── Track Button ── -->
+            <div class="track-btn-wrap">
+                <a href="https://magicalarts18.web.app/#order-status" class="track-btn">
+                    🔍 Track Your Order
+                </a>
+                <p style="font-size:12px;color:#9e8c7a;margin-top:10px;">
+                    Use Order ID: <strong style="color:#E67E22;">{{order_id}}</strong>
+                </p>
+            </div>
+
+            <hr class="divider">
+
+            <p style="font-size:13px;color:#9e8c7a;text-align:center;line-height:1.8;">
+                Questions? Reply to this email or reach us at<br>
+                <a href="mailto:magicalarts18@gmail.com"
+                    style="color:#E67E22;font-weight:600;">magicalarts18@gmail.com</a>
+                &nbsp;|&nbsp;
+                <a href="https://wa.me/917810078875" style="color:#25D366;font-weight:600;">WhatsApp Us</a>
+            </p>
+
+        </div><!-- /body -->
+
+        <!-- ═══ FOOTER ═══ -->
+        <div class="footer">
+            <div class="footer-logo">Magical<span>Arts</span></div>
+            <p>Custom Painting Studio — Turning Photos into Masterpieces</p>
+            <div class="social-links">
+                <a href="https://magicalarts18.web.app">🌐 Website</a>
+                <a href="mailto:magicalarts18@gmail.com">📧 Email</a>
+                <a href="https://wa.me/917810078875">💬 WhatsApp</a>
+            </div>
+            <p style="margin-top:8px;font-size:11px;">
+                © 2025 MagicalArts. All rights reserved.<br>
+                This email was sent because you placed an order on our website.
+            </p>
+        </div>
+
+    </div><!-- /wrapper -->
+
+</body>
+
+</html>
