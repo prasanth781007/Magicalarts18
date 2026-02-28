@@ -1,0 +1,3088 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Magicalarts - Custom Paintings</title>
+
+    <style>
+        /* ── OFFLINE BANNER ── */
+        #offline-banner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            background: #c0392b;
+            color: #fff;
+            text-align: center;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            animation: slideDown 0.3s ease;
+        }
+
+        #offline-banner.online-flash {
+            background: #27ae60;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        /* --- OVERLAY --- */
+        .app-dialog-overlay {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        /* --- CONTENT BOX (The White Card) --- */
+        .app-dialog-content {
+            background-color: #fefefe;
+            color: black;
+            /* 🎯 40px margin applied here */
+            margin: 40px;
+            padding: 35px;
+            border: none;
+            /* Centering */
+            position: absolute;
+            top: 50%;
+            left: 40%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 300px;
+            /* >>> SCROLLABILITY ADDITIONS <<< */
+            max-height: 80vh;
+            /* Limits the height to 80% of the viewport height */
+            overflow-y: auto;
+            /* Makes content scrollable if it exceeds max-height */
+            /* >>> END SCROLLABILITY ADDITIONS <<< */
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        /* --- CLOSE BUTTON --- */
+        .app-dialog-close-btn {
+            color: #333;
+            float: right;
+            font-size: 30px;
+            font-weight: 300;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .app-dialog-close-btn:hover,
+        .app-dialog-close-btn:focus {
+            color: #007bff;
+        }
+
+        /* Optional: Style the main button */
+
+        /* ====================
+           THEMING VARIABLES
+           ==================== */
+        :root {
+            --bg-color: #1a1200;
+            --text-color: #f5f5f5;
+            --accent: #E67E22;
+            --gray-text: #aaaaaa;
+            --card-bg: #2a1f08;
+            --header-bg: rgba(26, 18, 0, 0.85);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        body.light-theme {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --accent: #d35400;
+            --gray-text: #6c757d;
+            --card-bg: #ffffff;
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(0, 0, 0, 0.1);
+            --input-bg: rgba(0, 0, 0, 0.05);
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* HEADER */
+        header {
+            background-color: var(--header-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-menu a:hover {
+            color: var(--accent);
+        }
+
+        .theme-btn {
+            background: none;
+            border: 2px solid var(--accent);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: var(--transition);
+        }
+
+        .theme-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        /* HERO */
+        .hero {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('Image/IMG-20251126-WA0034.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            transition: background-image 1.5s ease-in-out;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #f0f0f0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.1);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        .section-title p {
+            color: var(--gray-text);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* PREVIEW GRID */
+        .style-btns {
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .type-btn {
+            padding: 12px 25px;
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--text-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .type-btn.active,
+        .type-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .preview-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .preview-card img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .preview-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        .preview-card .price {
+            font-size: 1rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* CUSTOMIZATION */
+        .customization-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .option-group {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .option-group h3 {
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .option-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .option-btn {
+            padding: 10px 20px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .option-btn:hover,
+        .option-btn.active {
+            background-color: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent);
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        /* PRICE SUMMARY BOX */
+        .price-summary {
+            background: var(--input-bg);
+            border: 1px solid var(--accent);
+            border-radius: 10px;
+            padding: 16px;
+            margin-left: 20px;
+            margin-right: 20px;
+            margin-top: 20px;
+            max-width: 400px;
+            font-family: Arial, sans-serif;
+        }
+
+        /* EACH ROW */
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        /* TOTAL SECTION */
+        .price-total {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid var(--accent);
+            margin-top: 10px;
+            padding-top: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        @media (max-width: 480px) {
+            .price-summary {
+                max-width: 100%;
+                padding: 14px;
+                font-size: 14px;
+            }
+
+            .price-item,
+            .price-total {
+                font-size: 14px;
+            }
+        }
+
+        .price-summary span:last-child {
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+
+        .price-summary span.price-animate {
+            transform: scale(1.1);
+            color: #27ae60;
+        }
+
+        /* COUPON BOX - UPDATED */
+        .coupon-box {
+            display: flex;
+            gap: 12px;
+            margin: 20px;
+            align-items: center;
+            background: var(--input-bg);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            max-width: 400px;
+        }
+
+        .coupon-box input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .coupon-box input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.2);
+        }
+
+        .coupon-box button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .coupon-box button:hover {
+            background: #d35400;
+            transform: translateY(-2px);
+        }
+
+        .coupon-box button:active {
+            transform: translateY(0);
+        }
+
+        #couponMsg {
+            font-size: 13px;
+            margin-top: 5px;
+            margin-left: 20px;
+        }
+
+        /* Coupon applied message */
+        .coupon-success {
+            color: #27ae60;
+        }
+
+        .coupon-error {
+            color: #e74c3c;
+        }
+
+        /* CHECKOUT */
+        .checkout-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .email-status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .email-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .email-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .email-pending {
+            background-color: #cce7ff;
+            color: #004085;
+        }
+
+        .email-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ARTIST & FOOTER */
+        .artist-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .artist-image img {
+            width: 100%;
+            border-radius: 50%;
+            box-shadow: var(--shadow);
+        }
+
+        .artist-info h3 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .artist-role {
+            color: var(--gray-text);
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .artist-info p {
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        footer {
+            background-color: #0f0b00;
+            padding: 60px 0 30px;
+            color: #f5f5f5;
+        }
+
+        body.light-theme footer {
+            background-color: #1a1a1a;
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background-color: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        .footer-links a {
+            color: #aaaaaa;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaaaaa;
+            font-size: 0.9rem;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: fixed;
+                top: 70px;
+                right: 0;
+                width: 70%;
+                height: calc(100vh - 70px);
+                background-color: var(--card-bg);
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+                border-left: 1px solid var(--border-color);
+                z-index: 1000;
+                overflow-y: auto;
+                transition: transform 0.3s ease;
+                transform: translateX(100%);
+                align-items: flex-start;
+            }
+
+            .nav-menu.active {
+                display: flex;
+                transform: translateX(0);
+            }
+
+            .nav-menu a {
+                padding: 15px 0;
+                border-bottom: 1px solid var(--border-color);
+                width: 100%;
+                font-size: 1.1rem;
+                text-align: left;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .artist-container,
+            .customization-container,
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        #mobile-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            backdrop-filter: blur(2px);
+            display: none;
+        }
+
+        #mobile-menu-overlay.active {
+            display: block;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .info-icon {
+            float: right;
+            font-size: 12px;
+
+        }
+
+        /* Update this existing class to align the icon and text */
+        .option-group h3 {
+            display: flex;
+            /* Enables flexbox layout */
+            justify-content: space-between;
+            /* Text on left, Icon on right */
+            align-items: center;
+            /* Vertically centers them */
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        /* Add this new style for the Info Icon Button */
+        #openModalBtn {
+            cursor: pointer;
+            font-size: 1.2rem;
+            /* Icon size */
+            color: var(--text-color);
+            /* Default color */
+            opacity: 0.7;
+            /* Slightly dimmed by default */
+            transition: all 0.3s ease;
+            /* Smooth animation */
+            padding: 5px;
+            /* Adds a clickable area buffer */
+            border-radius: 50%;
+            /* Circular hover effect background */
+        }
+
+        /* Hover Effect */
+        #openModalBtn:hover {
+            opacity: 1;
+            /* Fully visible */
+            color: var(--accent);
+            /* Changes to orange/accent color */
+            background-color: rgba(255, 255, 255, 0.1);
+            /* Subtle background glow */
+            transform: scale(1.1);
+            /* Slight zoom effect */
+        }
+
+        /* --- MODAL IMAGE STYLING --- */
+        .app-dialog-content img {
+            width: 100%;
+            /* Fills the width of the modal */
+            height: auto;
+            /* Keeps the image proportion correct */
+            max-height: 200px;
+            /* Reduced height slightly so text is visible without too much scrolling */
+            object-fit: cover;
+            /* Crops the image neatly */
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: block;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- SCROLLABLE AREA & SPACING --- */
+        .modal-scroll-area {
+            overflow-y: auto;
+            padding-right: 10px;
+            /* Space for scrollbar */
+            max-height: 60vh;
+            /* Ensure inner content scrolls */
+        }
+
+        /* Scrollbar styling for Chrome/Safari */
+        .modal-scroll-area::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-scroll-area::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 4px;
+        }
+
+        /* Blocks for each size item */
+        .content-block {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .content-block:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+
+        .content-block h3 {
+            font-size: 1.2rem;
+            color: var(--accent);
+            margin-top: 0;
+        }
+
+        .content-block p {
+            font-size: 0.95rem;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        /* Apply style to Size, Frame, and Finish info buttons */
+        #openModalBtn,
+        #openFrameModalBtn,
+        #openFinishModalBtn {
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text-color);
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            padding: 5px;
+            border-radius: 50%;
+        }
+
+        /* Hover effects for all */
+        #openModalBtn:hover,
+        #openFrameModalBtn:hover,
+        #openFinishModalBtn:hover {
+            opacity: 1;
+            color: var(--accent);
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+
+        /* ORDER COMPLETED CONFIRMATION */
+        /* Find this existing class and update it */
+        .order-completed-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--card-bg);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 30px;
+            z-index: 10000;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: none;
+
+            /* --- ADD THESE LINES BELOW --- */
+            max-height: 80vh;
+            /* Limits height to 80% of screen */
+            overflow-y: auto;
+            /* Adds a scrollbar inside if content is too long */
+        }
+
+        .order-completed-popup.active {
+            display: block;
+        }
+
+        .order-completed-popup i {
+            font-size: 4rem;
+            color: #27ae60;
+            margin-bottom: 20px;
+        }
+
+        .order-completed-popup h2 {
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .order-completed-popup p {
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .order-completed-popup .btn {
+            margin: 10px;
+        }
+
+        .order-completed-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            display: none;
+        }
+
+        .order-completed-overlay.active {
+            display: block;
+        }
+
+        /* Find this block in your <style> and update the margin */
+        .old-price {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 0.9rem;
+
+            /* CHANGE THIS LINE (Increase from 8px to 15px or 20px) */
+            margin-right: 15px;
+        }
+
+        .new-price {
+            color: #E67E22;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .vertical-button {
+            /* பட்டனின் இடம் மற்றும் நிலை */
+            position: fixed;
+            right: 0;
+            /* வலது பக்கம் ஒட்டி இருக்கும் */
+            top: 80%;
+            /* மேலிருந்து பாதியில் */
+            transform: translateY(-50%) rotate(-90deg);
+            /* வெர்டிகலாக மாற்றுகிறது */
+            transform-origin: right bottom;
+            /* சுழற்சியின் மையம் */
+
+            /* பட்டனின் தோற்றம் */
+            background-color: #007bff;
+            /* நீல நிறம் */
+            color: white;
+            padding: 5px 10px;
+            text-decoration: none;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+            border-radius: 5px 5px 0 0;
+            z-index: 9999;
+            /* மற்ற லேயர்களுக்கு மேல் தெரிய */
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .vertical-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* === ORDER FORM IMAGE UPLOAD === */
+        .order-upload-area {
+            border: 2px dashed var(--accent);
+            border-radius: var(--border-radius);
+            padding: 28px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background-color: var(--input-bg);
+            position: relative;
+        }
+
+        .order-upload-area:hover,
+        .order-upload-area.dragover {
+            background-color: rgba(230, 126, 34, 0.08);
+            border-color: var(--accent-light);
+            transform: scale(1.01);
+        }
+
+        .order-upload-area i.ou-icon {
+            font-size: 2.2rem;
+            color: var(--accent);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .order-upload-area p {
+            color: var(--gray-text);
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .order-upload-area small {
+            color: var(--gray-text);
+            font-size: 0.78rem;
+        }
+
+        #order-image-input {
+            display: none;
+        }
+
+        .ou-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 7px 20px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .ou-btn:hover {
+            filter: brightness(1.15);
+        }
+
+        .ou-preview-wrap {
+            margin-top: 14px;
+            display: none;
+            position: relative;
+            text-align: center;
+        }
+
+        .ou-preview-wrap img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: var(--border-radius);
+            border: 2px solid var(--accent);
+            object-fit: cover;
+            box-shadow: var(--shadow);
+        }
+
+        .ou-remove-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(231, 76, 60, 0.85);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .ou-remove-btn:hover {
+            background: #c0392b;
+        }
+
+        .ou-img-info {
+            font-size: 0.8rem;
+            color: var(--gray-text);
+            margin-top: 5px;
+        }
+
+        .ou-img-error {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 6px;
+            display: none;
+        }
+
+        /* ══════════════════════════════ ═ ════════════
+           UNIFIED ORDER LAYOUT
+        ════════════════════════════════════════════ */
+        .unified-order-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            align-items: start;
+        }
+
+        .order-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Step card */
+        .order-step-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 22px 20px;
+            transition: var(--transition);
+        }
+
+        .order-step-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 20px rgba(230, 126, 34, 0.08);
+        }
+
+        /* Step header row */
+        .step-hd {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .step-badge {
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(230, 126, 34, 0.35);
+        }
+
+        .step-lbl {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+            flex: 1;
+        }
+
+        .step-opt {
+            font-size: 0.75rem;
+            color: var(--gray-text);
+            background: rgba(230, 126, 34, 0.1);
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .info-ico {
+            cursor: pointer;
+            color: var(--accent);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .info-ico:hover {
+            color: var(--accent-light);
+            transform: scale(1.15);
+        }
+
+        /* Flat option-group inside step-card (no card-in-card) */
+        .option-group.flatgroup {
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
+            box-shadow: none;
+        }
+
+        /* Form icon */
+        .form-icon {
+            color: var(--accent);
+            margin-right: 5px;
+            font-size: 0.85rem;
+        }
+
+        .req {
+            color: #e74c3c;
+        }
+
+        /* Email checkbox row */
+        .email-chk-row label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        /* Price summary inside card — no extra outer card */
+        .order-step-card .price-summary {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+        }
+
+        .order-step-card .price-total {
+            border-top: 1px solid var(--border-color);
+            padding-top: 10px;
+            margin-top: 6px;
+        }
+
+        /* Coupon inside card */
+        .order-step-card .coupon-box {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .order-step-card .coupon-box input {
+            flex: 1;
+            padding: 10px 14px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 0.9rem;
+        }
+
+        .order-step-card .coupon-box button {
+            padding: 10px 18px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .order-step-card .coupon-box button:hover {
+            filter: brightness(1.1);
+        }
+
+        /* Place order button */
+        .btn-place-order {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.05rem;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .btn-place-order:disabled,
+        .btn-place-order[disabled] {
+            background: #888 !important;
+            filter: none !important;
+            cursor: not-allowed !important;
+            opacity: 0.6;
+            transform: none !important;
+        }
+
+        /* ── Responsive ─────────────────────────────── */
+        @media (max-width: 900px) {
+            .unified-order-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .order-step-card {
+                padding: 16px 14px;
+            }
+
+            .step-lbl {
+                font-size: 0.95rem;
+            }
+
+            .option-buttons {
+                flex-direction: column;
+            }
+
+            .option-btn {
+                width: 100%;
+            }
+
+            .order-step-card .coupon-box {
+                flex-direction: column;
+            }
+        }
+
+        /* ════════ ORDER STATUS SECTION ════════ */
+        #order-status {
+            padding: 80px 0;
+        }
+
+        .os-card {
+            max-width: 560px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 36px 32px;
+            box-shadow: var(--shadow);
+        }
+
+        .os-input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .os-input-row input {
+            flex: 1;
+            padding: 12px 16px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        .os-input-row input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .os-btn {
+            padding: 12px 22px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .os-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        .os-result {
+            margin-top: 22px;
+            display: none;
+            animation: fadeUp 0.35s ease;
+        }
+
+        .os-not-found {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray-text);
+        }
+
+        .os-not-found i {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 10px;
+            color: #e74c3c;
+        }
+
+        /* Status badge */
+        .os-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.88rem;
+            letter-spacing: 0.3px;
+        }
+
+        .os-status-received {
+            background: rgba(52, 152, 219, 0.15);
+            color: #3498db;
+        }
+
+        .os-status-progress {
+            background: rgba(230, 126, 34, 0.15);
+            color: #E67E22;
+        }
+
+        .os-status-completed {
+            background: rgba(39, 174, 96, 0.15);
+            color: #27ae60;
+        }
+
+        .os-status-shipped {
+            background: rgba(155, 89, 182, 0.15);
+            color: #9b59b6;
+        }
+
+        .os-status-delivered {
+            background: rgba(39, 174, 96, 0.25);
+            color: #27ae60;
+        }
+
+        /* Order detail card */
+        .os-order-detail {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .os-order-header {
+            background: rgba(230, 126, 34, 0.1);
+            border-bottom: 1px solid var(--border-color);
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .os-order-id {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 1rem;
+        }
+
+        .os-order-body {
+            padding: 16px 18px;
+        }
+
+        .os-detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 7px 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+
+        .os-detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .os-detail-row span:first-child {
+            color: var(--gray-text);
+        }
+
+        .os-detail-row span:last-child {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        /* Progress steps */
+        .os-progress {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin: 20px 0 10px;
+            flex-wrap: wrap;
+        }
+
+        .os-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.72rem;
+            color: var(--gray-text);
+            position: relative;
+            min-width: 70px;
+        }
+
+        .os-step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            z-index: 1;
+            transition: all 0.3s;
+        }
+
+        .os-step.done .os-step-circle {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .os-step.active .os-step-circle {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 0 4px rgba(230, 126, 34, 0.25);
+        }
+
+        .os-step.done .os-step-lbl,
+        .os-step.active .os-step-lbl {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .os-connector {
+            flex: 1;
+            height: 2px;
+            background: var(--border-color);
+            min-width: 20px;
+            margin-bottom: 18px;
+            transition: background 0.3s;
+        }
+
+        .os-connector.done {
+            background: var(--accent);
+        }
+
+        @media(max-width:480px) {
+            .os-input-row {
+                flex-direction: column;
+            }
+
+            .os-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="">
+    <!-- Offline / Online Banner -->
+    <div id="offline-banner">
+        <i class="fas fa-wifi-slash"></i> You are offline. Some features may not work until your connection is restored.
+    </div>
+
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <img src="Image/logo.png" style="height:40px; width:40px; border-radius:50px;">
+                <span>MagicalArts</span>
+
+            </a>
+            <button id="theme-toggle" class="theme-btn">
+                <i class="fas fa-moon"></i>
+            </button>
+            <nav class="nav-menu">
+                <a href="gallery.html">Gallery</a>
+                <a href="#customization">Customize</a>
+                <a href="contact.html">contact us</a>
+                <a href="#customization">Order</a>
+                <a href="#order-status">Order Status</a>
+                <a href="#cofounder">co-founder</a>
+                <a href="#founder">founder</a>
+
+            </nav>
+            <div class="hamburger"><i class="fas fa-bars"></i></div>
+        </div>
+    </header>
+
+    <!-- Order Completion Popup -->
+    <div class="order-completed-overlay" id="orderCompletedOverlay"></div>
+    <div class="order-completed-popup" id="orderCompletedPopup">
+        <i class="fas fa-check-circle" style="font-size:3.5rem;color:#27ae60;margin-bottom:12px;"></i>
+        <h2 style="color:var(--accent);margin-bottom:6px;">Order Placed Successfully!</h2>
+        <p style="color:var(--gray-text);margin-bottom:18px;font-size:0.92rem;">Your custom painting is now being
+            processed.</p>
+
+        <!-- Order Detail Card -->
+        <div id="popup-order-card"
+            style="background:rgba(230,126,34,0.07);border:1px solid rgba(230,126,34,0.3);border-radius:10px;padding:16px;text-align:left;margin-bottom:16px;font-size:0.88rem;">
+            <div
+                style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(230,126,34,0.2);">
+                <span style="font-weight:700;color:var(--accent);font-size:1rem;"><i class="fas fa-receipt"></i> Order
+                    Summary</span>
+                <span id="popup-order-id" style="font-weight:700;color:var(--accent);"></span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <div><span style="color:var(--gray-text);">Name</span><br><strong id="popup-name">—</strong></div>
+                <div><span style="color:var(--gray-text);">Phone</span><br><strong id="popup-phone">—</strong></div>
+                <div><span style="color:var(--gray-text);">Style</span><br><strong id="popup-style">—</strong></div>
+                <div><span style="color:var(--gray-text);">Size</span><br><strong id="popup-size">—</strong></div>
+                <div><span style="color:var(--gray-text);">Persons</span><br><strong id="popup-persons">—</strong></div>
+                <div><span style="color:var(--gray-text);">Date</span><br><strong id="popup-date">—</strong></div>
+            </div>
+            <div style="border-top:1px solid rgba(230,126,34,0.2);margin-top:10px;padding-top:8px;">
+                <span style="color:var(--gray-text);">Email</span><br><strong id="popup-email">—</strong>
+            </div>
+        </div>
+
+        <!-- Info list -->
+        <ul style="text-align:left;margin:0 0 16px 0;padding-left:18px;font-size:0.85rem;color:var(--text-color);">
+            <li>✅ Confirmation sent to your email</li>
+            <li style="color:#e74c3c;">✅ Prepaid basis — payment details shared by our team</li>
+            <li>✅ Finished within 7–10 days</li>
+            <li>✅ Join our channel for exclusive art updates</li>
+        </ul>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+            <button class="btn" onclick="downloadOrderPDF()" style="width:100%;background:var(--accent);border:none;">
+                <i class="fas fa-download"></i> Download Order Receipt (PDF)
+            </button>
+            <button class="btn" onclick="window.open('https://whatsapp.com/channel/0029VbBcStfHgZWafZuurC2h','_blank')"
+                style="width:100%;background-color:#25D366;border:none;">
+                <i class="fab fa-whatsapp"></i> Join WhatsApp Channel
+            </button>
+            <button class="btn btn-outline" onclick="closeOrderCompleted()" style="width:100%;">
+                Continue Browsing
+            </button>
+        </div>
+    </div>
+
+
+
+    <section class="hero" id="hero-section">
+        <div class="container hero-content">
+            <h1>Transform Your Vision Into Art</h1>
+            <p>Commission bespoke paintings that capture your unique style and transform your space</p>
+            <div class="hero-buttons">
+                <a href="gallery.html" class="btn">Browse Gallery</a>
+                <a href="#customization" class="btn btn-outline">Start Customizing</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="drawing-preview">
+        <div class="container">
+            <div class="section-title">
+                <h2>Drawing Style Preview</h2>
+                <p>Click a style to view sample drawing results</p>
+            </div>
+            <div class="style-btns">
+                <button class="type-btn active" data-type="color">Colour Drawing</button>
+                <button class="type-btn" data-type="pencil">Pencil Drawing</button>
+            </div>
+            <div class="preview-grid" id="preview-grid"></div>
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="gallery.html" class="btn">Explore More Art →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ UNIFIED ORDER SECTION ═══════════ -->
+    <section id="customization">
+        <div class="container">
+            <div class="section-title">
+                <h2>Customize &amp; Place Your Order</h2>
+                <p>Upload your photo, pick your style, fill your details — we'll create your masterpiece</p>
+            </div>
+
+            <div class="unified-order-layout">
+
+                <!-- ═══ LEFT COLUMN ═══ -->
+                <div class="order-col order-col-left">
+
+                    <!-- STEP 1: Upload Photo -->
+                    <div class="order-step-card">
+                        <div class="step-hd">
+                            <span class="step-badge">1</span>
+                            <span class="step-lbl">Upload Reference Photo</span>
+                            <span class="step-opt">Optional · Max 1MB</span>
+                        </div>
+                        <div class="order-upload-area" id="order-upload-area">
+                            <i class="fas fa-cloud-upload-alt ou-icon"></i>
+                            <p>Drag &amp; drop your photo here</p>
+                            <small>JPG · PNG · WEBP · GIF</small><br>
+                            <label for="order-image-input" class="ou-btn">Browse File</label>
+                            <input type="file" id="order-image-input" accept="image/*">
+                        </div>
+                        <div class="ou-preview-wrap" id="ou-preview-wrap">
+                            <img id="ou-preview-img" src="" alt="Preview">
+                            <button type="button" class="ou-remove-btn" id="ou-remove-btn"
+                                title="Remove">&times;</button>
+                            <p class="ou-img-info" id="ou-img-info"></p>
+                        </div>
+                        <p class="ou-img-error" id="ou-img-error"><i class="fas fa-exclamation-circle"></i> Image must
+                            be under 1MB.</p>
+                    </div>
+
+                    <!-- STEPS 2 · 3 · 4 — kept inside .customization-options for JS selectors -->
+                    <div class="customization-options">
+
+                        <!-- STEP 2: Drawing Type -->
+                        <div class="order-step-card">
+                            <div class="step-hd">
+                                <span class="step-badge">2</span>
+                                <span class="step-lbl">Drawing Type</span>
+                            </div>
+                            <div class="option-group flatgroup">
+                                <div class="option-buttons">
+                                    <button class="option-btn" type="button">Black &amp; White</button>
+                                    <button class="option-btn active" type="button">Color Drawing</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 3: Select Size -->
+                        <div class="order-step-card">
+                            <div class="step-hd">
+                                <span class="step-badge">3</span>
+                                <span class="step-lbl">Select Size</span>
+                                <span id="openModalBtn" class="info-ico" title="Size Guide"><i
+                                        class="fa-solid fa-circle-info"></i></span>
+                            </div>
+                            <div class="option-group flatgroup">
+                                <div class="option-buttons">
+                                    <button class="option-btn" type="button" data-price="0">Small (A5)</button>
+                                    <button class="option-btn active" type="button" data-price="10">Medium (A4)</button>
+                                    <button class="option-btn" type="button" data-price="15">Large (A3)</button>
+                                    <button class="option-btn" type="button" data-price="0">Custom Size</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 4: Number of Persons -->
+                        <div class="order-step-card">
+                            <div class="step-hd">
+                                <span class="step-badge">4</span>
+                                <span class="step-lbl">Number of Persons</span>
+                                <span id="openPersonsModalBtn" class="info-ico" title="Persons Guide"><i
+                                        class="fa-solid fa-circle-info"></i></span>
+                            </div>
+                            <div class="option-group flatgroup">
+                                <div class="option-buttons" id="persons-buttons">
+                                    <button class="option-btn active" type="button" data-price="0" data-persons="1">1
+                                        Person</button>
+                                    <button class="option-btn" type="button" data-price="50" data-persons="2">2
+                                        Persons</button>
+                                    <button class="option-btn" type="button" data-price="80" data-persons="3">3
+                                        Persons</button>
+                                    <button class="option-btn" type="button" data-price="custom"
+                                        data-persons="custom">Custom</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div><!-- /.customization-options -->
+                </div><!-- /.order-col-left -->
+
+                <!-- ═══ RIGHT COLUMN ═══ -->
+                <div class="order-col order-col-right">
+                    <form id="upload-form">
+
+                        <!-- STEPS 5–9: Customer Details -->
+                        <div class="order-step-card">
+                            <div class="step-hd">
+                                <span class="step-badge">5</span>
+                                <span class="step-lbl">Your Details</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="customer-name"><i class="fas fa-user form-icon"></i> Full Name <span
+                                        class="req">*</span></label>
+                                <input type="text" id="customer-name" class="form-control"
+                                    placeholder="Enter your full name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-email"><i class="fas fa-envelope form-icon"></i> Email Address
+                                    <span class="req">*</span></label>
+                                <input type="email" id="customer-email" class="form-control"
+                                    placeholder="Enter your email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-phone"><i class="fas fa-phone form-icon"></i> Phone Number <span
+                                        class="req">*</span></label>
+                                <input type="tel" id="customer-phone" class="form-control"
+                                    placeholder="Enter your phone number" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="customer-address"><i class="fas fa-map-marker-alt form-icon"></i> Shipping
+                                    Address</label>
+                                <textarea id="customer-address" class="form-control" rows="2"
+                                    placeholder="Enter your complete address (optional)"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="instructions"><i class="fas fa-sticky-note form-icon"></i> Special
+                                    Instructions</label>
+                                <textarea id="instructions" class="form-control" rows="2"
+                                    placeholder="Any special requests or details (optional)"></textarea>
+                            </div>
+                        </div>
+
+
+
+                        <!-- Email checkbox -->
+                        <div class="form-group email-chk-row">
+                            <label>
+                                <input type="checkbox" id="send-email" checked>
+                                <span>Send order confirmation via Email</span>
+                            </label>
+                        </div>
+
+                        <div id="email-status-container" style="display:none;"></div>
+                        <div class="loading-spinner hidden" id="loading-spinner"></div>
+
+                        <!-- STEP 7: Place Order -->
+                        <button type="submit" id="submit-btn" class="btn btn-place-order">
+                            <i class="fas fa-palette"></i> Place Order
+                        </button>
+
+                    </form><!-- /#upload-form -->
+                </div><!-- /.order-col-right -->
+
+            </div><!-- /.unified-order-layout -->
+
+            <!-- ═══ MODALS (remain in DOM) ═══ -->
+            <div id="myModal" class="app-dialog-overlay">
+                <div class="app-dialog-content">
+                    <span class="app-dialog-close-btn">&times;</span>
+                    <h2 style="text-align:center;margin-bottom:20px;">Size Guide</h2>
+                    <div class="modal-scroll-area">
+                        <div class="content-block">
+                            <h3>Small (12"x16")</h3>
+                            <img src="Image\sizeexample.jpg" alt="Small Size Preview">
+                            <p><strong>Ideal for:</strong> Desks, shelves, or narrow wall spaces.</p>
+                            <p><strong>Best Subject:</strong> Single person portraits or pet portraits (Head &amp;
+                                Shoulders).</p>
+                            <p><strong>Comparison:</strong> Roughly the size of an A3 paper.</p>
+                        </div>
+                        <div class="content-block">
+                            <h3>Medium (18"x24")</h3>
+                            <img src="Image\sizeexample.jpg" alt="Medium Size Preview">
+                            <p><strong>Ideal for:</strong> Bedrooms, hallways, or office walls.</p>
+                            <p><strong>Best Subject:</strong> Couples, half-body portraits, or detailed close-ups.</p>
+                            <p><strong>Comparison:</strong> Our most popular standard poster size.</p>
+                        </div>
+                        <div class="content-block">
+                            <h3>Large (24"x36")</h3>
+                            <img src="Image\sizeexample.jpg" alt="Large Size Preview">
+                            <p><strong>Ideal for:</strong> Living rooms, main focal points, or above the sofa.</p>
+                            <p><strong>Best Subject:</strong> Family portraits (3+ people), full-body sketches, or
+                                highly detailed scenery.</p>
+                        </div>
+                        <div class="content-block">
+                            <h3>Custom Size</h3>
+                            <img src="Image\sizeexample.jpg" alt="Custom Size Preview">
+                            <p><strong>Need something specific?</strong></p>
+                            <p>We can create artwork to fit specific frames or unique wall spaces.</p>
+                            <p><em>Please mention your dimensions in the 'Special Instructions' box.</em></p>
+                            <p>
+                            <h3>Extra:</h3>We will contact soon</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Persons Modal -->
+            <div id="personsModal" class="app-dialog-overlay">
+                <div class="app-dialog-content">
+                    <span class="app-dialog-close-btn">&times;</span>
+                    <h2 style="text-align:center;margin-bottom:20px;">Number of Persons Guide</h2>
+                    <div class="modal-scroll-area">
+                        <div class="content-block">
+                            <h3>1 Person</h3>
+                            <img src="Image\exfoeperson1.jpg" alt="Single Portrait">
+                            <p><strong>Ideal for:</strong> Individual portraits, pet drawings, or single subject
+                                artwork.</p>
+                        </div>
+                        <div class="content-block">
+                            <h3>2 Persons</h3>
+                            <img src="Image\exfoeperson2.jpg" alt="Couple Portrait">
+                            <p><strong>Ideal for:</strong> Couples, friends, siblings, or parent-child portraits.</p>
+                        </div>
+                        <div class="content-block">
+                            <h3>3 Persons</h3>
+                            <img src="Image\exfoeperson3.jpg" alt="Family Portrait">
+                            <p><strong>Ideal for:</strong> Small families, group of friends, or team portraits.</p>
+                        </div>
+                        <div class="content-block">
+                            <h3>Custom (4+ Persons)</h3>
+                            <img src="https://via.placeholder.com/300x200?text=Large+Group" alt="Large Group">
+                            <p><strong>Need more than 3 persons?</strong></p>
+                            <p>Please select "Custom" and mention the number of persons in the 'Special Instructions'
+                                box. We'll contact you with a custom quote.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /.container -->
+    </section>
+
+
+    <!-- ═══════════ ORDER STATUS SECTION ═══════════ -->
+    <section id="order-status">
+        <div class="container">
+            <div class="section-title">
+                <h2>Track Your Order</h2>
+                <p>Enter your Order ID to check the live status of your painting</p>
+            </div>
+
+            <div class="os-card">
+                <div class="os-input-row">
+                    <input type="text" id="os-input" placeholder="Enter your Order ID (e.g. MA123456)"
+                        autocomplete="off">
+                    <button class="os-btn" onclick="checkOrderStatus()">
+                        <i class="fas fa-search"></i> Track
+                    </button>
+                </div>
+                <p style="font-size:0.82rem;color:var(--gray-text);"><i class="fas fa-info-circle"></i> Your Order ID
+                    was shown after placing the order and sent in the confirmation email.</p>
+
+                <!-- Result area -->
+                <div class="os-result" id="os-result"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about-artist">
+        <div class="container" id="founder">
+            <div class="section-title">
+                <h2>About the Artist & Founder</h2>
+            </div>
+            <div class="artist-container">
+                <div class="artist-image">
+                    <img src="Image/artist.jpg" alt="Lingesh" onerror="this.src='https://via.placeholder.com/400'">
+                </div>
+                <div class="artist-info">
+                    <h3>Lingesh</h3>
+                    <p class="artist-role">Founder • Lead Artist</p>
+                    <p>Specializing in pencil sketches and color portraits, Lingesh transforms ordinary photographs into
+                        timeless masterpieces.</p>
+                    <a href="gallery.html" class="btn">My works</a>
+
+                </div>
+            </div>
+            <hr style="margin: 40px 0; border-color: var(--border-color);" id="cofounder">
+            <div class="section-title">
+                <h2>About the Co-Founder</h2>
+                <p>Web Developer & Designer</p>
+            </div>
+            <div class="artist-container">
+                <div class="artist-image">
+                    <img src="Image/co-founderimage.jpg" alt="Prasanth"
+                        onerror="this.src='https://via.placeholder.com/400'">
+                </div>
+                <div class="artist-info">
+                    <h3>Prasanth</h3>
+                    <p class="artist-role">Co-Founder • Digital Creator</p>
+                    <p>A passionate web developer specializing in creating responsive, user-friendly websites.</p>
+                    <a href="https://prasanth781007.github.io/Portfolio-/project%20.html" class="btn">My works</a>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-about">
+                    <div class="footer-logo">
+                        <img src="Image/logo.png" style="height:40px; width:40px; border-radius:50px;">
+                        <span>MagicalArts</span>
+                    </div>
+                    <p>Transforming visions into timeless artwork since 2025.</p>
+                    <div class="social-links">
+                        <a href="https://www.instagram.com/magicalarts18"><i class="fab fa-instagram"></i></a>
+                        <a href="https://whatsapp.com/channel/0029VbBcStfHgZWafZuurC2h"><i
+                                class="fab fa-whatsapp"></i></a>
+                        <a href="https://www.linkedin.com/in/prasanth-k-741b64381"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="#customization">Customization</a></li>
+                        <li><a href="contact.html">contact us</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-phone"></i> +91 82486 78722</p>
+                    <p><i class="fas fa-envelope"></i> magicalarts18@gmail.com</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy;2025 All rights reserved. Created by <a href="#cofounder"
+                        style="color:var(--accent);">Prasanth</a>
+                    &nbsp;|&nbsp;
+                    <a href="admin.html" style="color:var(--gray);font-size:0.85rem;" title="Admin Panel">
+                        <i class="fas fa-lock"></i> Admin
+                    </a>
+                </p>
+            </div>
+        </div>
+    </footer>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import {
+            getFirestore, collection, addDoc, serverTimestamp, getDoc, doc,
+            getDocs, query, where, enableIndexedDbPersistence
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBe7jNWvfkNthXnpN6I8UUQwi5Ijfd9lR8",
+            authDomain: "magicalarts-18.firebaseapp.com",
+            projectId: "magicalarts-18",
+            storageBucket: "magicalarts-18.firebasestorage.app",
+            messagingSenderId: "168684333077",
+            appId: "1:168684333077:web:19582d7010660900d0c61c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Enable offline persistence so orders are queued even without internet
+        enableIndexedDbPersistence(db).catch(err => {
+            if (err.code === 'failed-precondition') {
+                console.warn('Firestore persistence unavailable: multiple tabs open.');
+            } else if (err.code === 'unimplemented') {
+                console.warn('Firestore persistence not supported in this browser.');
+            }
+        });
+
+        window._orderDB = db;
+        window._orderAddDoc = addDoc;
+        window._orderCollection = collection;
+        window._orderServerTS = serverTimestamp;
+        window._orderGetDocs = getDocs;
+        window._orderQuery = query;
+        window._orderWhere = where;
+
+        // Load rates dynamically
+        (async function loadRates() {
+            try {
+                const snap = await getDoc(doc(db, 'settings', 'rates'));
+                if (snap.exists()) {
+                    window.appRates = snap.data();
+                    if (typeof window.updatePriceUIGlobally === 'function') window.updatePriceUIGlobally();
+                }
+            } catch (e) {
+                console.log('Could not load rates', e);
+            }
+        })();
+
+        console.log("\u2713 Firebase ready (index.html)");
+    </script>
+
+    <!-- Offline / Online detection -->
+    <script>
+        (function () {
+            const banner = document.getElementById('offline-banner');
+
+            // ── file:// protocol warning ──────────────────────────────────
+            if (window.location.protocol === 'file:') {
+                banner.style.background = '#d35400';
+                banner.innerHTML = '<i class="fas fa-exclamation-circle"></i>&nbsp; <strong>Local file detected:</strong> Firebase requires a web server (http/https). Open with <strong>VS Code Live Server</strong> or upload to hosting. Order saving to database is disabled in this mode.';
+                banner.style.display = 'block';
+                // Mark globally so submit handler knows
+                window._firebaseBlocked = true;
+            }
+
+            // ── online / offline events ───────────────────────────────────
+            function showOffline() {
+                banner.classList.remove('online-flash');
+                banner.innerHTML = '<i class="fas fa-exclamation-triangle"></i> You are offline. Order saving will retry automatically when you reconnect.';
+                banner.style.background = '#c0392b';
+                banner.style.display = 'block';
+            }
+            function showOnline() {
+                banner.classList.add('online-flash');
+                banner.innerHTML = '<i class="fas fa-check-circle"></i> Back online! Everything is working normally.';
+                banner.style.background = '#27ae60';
+                banner.style.display = 'block';
+                setTimeout(() => { banner.style.display = 'none'; }, 3000);
+            }
+            window.addEventListener('offline', showOffline);
+            window.addEventListener('online', showOnline);
+            // Check immediately on load
+            if (!navigator.onLine) showOffline();
+        })();
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <script>
+        // =========================
+        // GLOBAL CONFIGURATIONS
+        // =========================
+        const EMAIL_CONFIG = {
+            serviceId: "service_haqeiln",
+            templateId: "template_lokyfvm",
+            publicKey: "6N_lqIvH8QuvPEEbT"
+        };
+
+        const BUSINESS_EMAIL = "magicalarts18@gmail.com";
+        const WHATSAPP_NUMBER = "917810078875";
+
+        // Coupons configuration
+        const coupons = {
+            YEAR_OFF10: { type: 'percent', value: 10 },
+            FLAT50: { type: 'flat', value: 10 },
+            MAGICAL18: { type: 'flat', value: 20 },
+            PRASANTH: { type: 'flat', value: 35 },
+        };
+
+        let appliedCoupon = null;
+
+        // =========================
+        // ORDER IMAGE UPLOAD HANDLER
+        // =========================
+        const orderUploadArea = document.getElementById('order-upload-area');
+        const orderImageInput = document.getElementById('order-image-input');
+        const ouPreviewWrap = document.getElementById('ou-preview-wrap');
+        const ouPreviewImg = document.getElementById('ou-preview-img');
+        const ouRemoveBtn = document.getElementById('ou-remove-btn');
+        const ouImgInfo = document.getElementById('ou-img-info');
+        const ouImgError = document.getElementById('ou-img-error');
+        const ORDER_MAX_MB = 1;
+        let orderImageBase64 = null;
+
+        function ouFormatBytes(bytes) {
+            return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+        }
+
+        function handleOrderImage(file) {
+            const submitBtn = document.getElementById('submit-btn');
+            ouImgError.style.display = 'none';
+            if (!file || !file.type.startsWith('image/')) return;
+            if (file.size > ORDER_MAX_MB * 1024 * 1024) {
+                ouImgError.style.display = 'block';
+                orderImageInput.value = '';
+                orderImageBase64 = null;
+                ouPreviewWrap.style.display = 'none';
+                // Disable Place Order button when image is too large
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.title = 'Please upload an image under 1MB to place your order';
+                }
+                return;
+            }
+            // Valid image — ensure button is enabled
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.title = '';
+            }
+            const reader = new FileReader();
+            reader.onload = ev => {
+                orderImageBase64 = ev.target.result;
+                ouPreviewImg.src = orderImageBase64;
+                ouPreviewWrap.style.display = 'block';
+                ouImgInfo.textContent = `${file.name} (${ouFormatBytes(file.size)})`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        orderImageInput.addEventListener('change', function () {
+            if (this.files[0]) handleOrderImage(this.files[0]);
+        });
+        orderUploadArea.addEventListener('dragover', e => {
+            e.preventDefault();
+            orderUploadArea.classList.add('dragover');
+        });
+        orderUploadArea.addEventListener('dragleave', () => orderUploadArea.classList.remove('dragover'));
+        orderUploadArea.addEventListener('drop', e => {
+            e.preventDefault();
+            orderUploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) { orderImageInput.files = e.dataTransfer.files; handleOrderImage(file); }
+        });
+        ouRemoveBtn.addEventListener('click', () => {
+            const submitBtn = document.getElementById('submit-btn');
+            orderImageBase64 = null;
+            ouPreviewWrap.style.display = 'none';
+            ouPreviewImg.src = '';
+            ouImgInfo.textContent = '';
+            orderImageInput.value = '';
+            ouImgError.style.display = 'none';
+            // Re-enable Place Order button when image is removed
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.title = '';
+            }
+        });
+
+        // =========================
+        // MODAL SETUP
+        // =========================
+        document.addEventListener('DOMContentLoaded', () => {
+
+            function setupModal(modalId, btnId) {
+                const modal = document.getElementById(modalId);
+                const btn = document.getElementById(btnId);
+                const closeBtn = modal ? modal.querySelector('.app-dialog-close-btn') : null;
+
+                if (modal && btn && closeBtn) {
+                    btn.onclick = () => modal.style.display = 'block';
+                    closeBtn.onclick = () => modal.style.display = 'none';
+                }
+            }
+
+            // Setup both modals
+            setupModal('myModal', 'openModalBtn');
+            setupModal('personsModal', 'openPersonsModalBtn');
+
+            window.onclick = function (event) {
+                if (event.target.classList.contains('app-dialog-overlay')) {
+                    event.target.style.display = 'none';
+                }
+            }
+        });
+
+        // =========================
+        // ORDER COMPLETION POPUP FUNCTIONS
+        // =========================
+        // store order data for PDF download
+        let _popupOrderData = {};
+
+        function showOrderCompleted(orderData) {
+            // Fill popup fields
+            _popupOrderData = orderData || {};
+            document.getElementById('popup-order-id').textContent = orderData.orderId || '';
+            document.getElementById('popup-name').textContent = orderData.name || '—';
+            document.getElementById('popup-phone').textContent = orderData.phone || '—';
+            document.getElementById('popup-email').textContent = orderData.email || '—';
+            document.getElementById('popup-style').textContent = orderData.style || '—';
+            document.getElementById('popup-size').textContent = orderData.size || '—';
+            document.getElementById('popup-persons').textContent = orderData.persons || '—';
+            document.getElementById('popup-date').textContent = orderData.date || '—';
+
+            document.getElementById('orderCompletedPopup').classList.add('active');
+            document.getElementById('orderCompletedOverlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeOrderCompleted() {
+            document.getElementById('orderCompletedPopup').classList.remove('active');
+            document.getElementById('orderCompletedOverlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // =========================
+        // DOWNLOAD ORDER PDF
+        // =========================
+        function downloadOrderPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+            const o = _popupOrderData;
+            const pageW = 210;
+            const margin = 18;
+            const contentW = pageW - margin * 2;
+
+            // ── Background ──────────────────────────────────────────────────
+            doc.setFillColor(26, 18, 0);
+            doc.rect(0, 0, pageW, 297, 'F');
+
+            // ── Header bar ──────────────────────────────────────────────────
+            doc.setFillColor(230, 126, 34);
+            doc.rect(0, 0, pageW, 28, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(18);
+            doc.text('MagicalArts', margin, 12);
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Custom Painting Studio', margin, 19);
+            doc.setFontSize(9);
+            doc.text('ORDER RECEIPT', pageW - margin, 12, { align: 'right' });
+            doc.text(o.date || '', pageW - margin, 19, { align: 'right' });
+
+            // ── Order ID banner ──────────────────────────────────────────────
+            doc.setFillColor(42, 31, 8);
+            doc.roundedRect(margin, 34, contentW, 14, 3, 3, 'F');
+            doc.setTextColor(230, 126, 34);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.text('Order ID: ' + (o.orderId || '—'), pageW / 2, 43, { align: 'center' });
+
+            // ── Section helper ───────────────────────────────────────────────
+            let y = 56;
+            function sectionTitle(title) {
+                doc.setFillColor(230, 126, 34);
+                doc.rect(margin, y, 3, 7, 'F');
+                doc.setTextColor(230, 126, 34);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(10);
+                doc.text(title, margin + 6, y + 5.5);
+                y += 12;
+            }
+            function row(label, value) {
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9.5);
+                doc.setTextColor(170, 170, 170);
+                doc.text(label, margin, y);
+                doc.setTextColor(245, 245, 245);
+                doc.setFont('helvetica', 'bold');
+                doc.text(String(value || '—'), margin + 48, y);
+                y += 8;
+            }
+            function divider() {
+                doc.setDrawColor(60, 45, 10);
+                doc.line(margin, y, margin + contentW, y);
+                y += 6;
+            }
+
+            // ── Customer Details ─────────────────────────────────────────────
+            sectionTitle('Customer Details');
+            row('Name', o.name);
+            row('Email', o.email);
+            row('Phone', o.phone);
+            row('Address', o.address || 'Not provided');
+            divider();
+
+            // ── Order Details ────────────────────────────────────────────────
+            sectionTitle('Order Details');
+            row('Drawing Style', o.style);
+            row('Size', o.size);
+            row('Persons', o.persons);
+            row('Instructions', o.instructions || 'None');
+            divider();
+
+            // ── Note ─────────────────────────────────────────────────────────
+            doc.setFillColor(42, 31, 8);
+            doc.roundedRect(margin, y, contentW, 22, 3, 3, 'F');
+            doc.setTextColor(230, 126, 34);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9);
+            doc.text('Important Note', margin + 5, y + 7);
+            doc.setTextColor(200, 200, 200);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.text('All paintings are on a prepaid basis. Our team will contact you', margin + 5, y + 13);
+            doc.text('with payment details. Delivery: 7-10 working days.', margin + 5, y + 19);
+            y += 28;
+
+            // ── Footer ───────────────────────────────────────────────────────
+            doc.setFillColor(230, 126, 34);
+            doc.rect(0, 285, pageW, 12, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.text('magicalarts18@gmail.com  |  +91 82486 78722  |  Thank you for choosing MagicalArts!', pageW / 2, 292, { align: 'center' });
+
+            doc.save('MagicalArts_Order_' + (o.orderId || 'Receipt') + '.pdf');
+        }
+
+        // =========================
+        // INITIALIZE EMAILJS
+        // =========================
+        (function () {
+            emailjs.init(EMAIL_CONFIG.publicKey);
+            console.log("✓ EmailJS initialized");
+        })();
+
+        // =========================
+        // HERO SLIDESHOW
+        // =========================
+        document.addEventListener("DOMContentLoaded", function () {
+            const heroImages = [
+                "Image/IMG-20251126-WA0034.jpg",
+                "Image/IMG-20251126-WA0032.jpg",
+                "Image/IMG-20251126-WA0039.jpg",
+                "Image/IMG-20251126-WA0028.jpg"
+            ];
+            let currentIndex = 0;
+            const heroSection = document.getElementById("hero-section");
+            if (heroSection) {
+                function changeHeroBackground() {
+                    const nextImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${heroImages[currentIndex]}')`;
+                    heroSection.style.backgroundImage = nextImage;
+                    currentIndex = (currentIndex + 1) % heroImages.length;
+                }
+                changeHeroBackground();
+                setInterval(changeHeroBackground, 5000);
+            }
+        });
+
+        // =========================
+        // DRAWING PREVIEW DATA (UPDATED WITH MRP)
+        // =========================
+        const drawingSamples = {
+            pencil: [
+                { img: "exfoeperson1.jpg", title: "Realistic Pencil Portrait", mrp: 400, price: 250 },
+
+                { img: "pencil5.jpg", title: "Realistic Pencil Portrait", mrp: 400, price: 250 },
+                { img: "pencil6.jpg", title: "Hand-Shaded Sketch", mrp: 350, price: 200 },
+                { img: "pencil1.jpg", title: "Charcoal Finish", mrp: 350, price: 200 },
+                { img: "pencil2.jpg", title: "Detailed Sketch", mrp: 350, price: 200 }
+            ],
+            color: [
+                { img: "IMG-20251126-WA0034.jpg", title: "Vibrant Color Portrait", mrp: 600, price: 499 },
+                { img: "IMG-20251126-WA0039.jpg", title: "Digital Color Artwork", mrp: 550, price: 489 },
+                { img: "color3.jpg", title: "Oil Paint Effect", mrp: 700, price: 589 },
+                { img: "IMG-20251126-WA0031.jpg", title: "Soft Tone Art", mrp: 550, price: 489 },
+                { img: "IMG-20251126-WA0032.jpg", title: "Classic Color", mrp: 550, price: 489 }
+            ]
+        };
+
+        function loadImages(type) {
+            const grid = document.getElementById("preview-grid");
+            if (!grid) return;
+            grid.innerHTML = "";
+
+            (drawingSamples[type] || []).forEach(item => {
+                const card = document.createElement("div");
+                card.classList.add("preview-card");
+
+                card.innerHTML = `
+            <img src="Image/${item.img}" onerror="this.src='https://via.placeholder.com/300x400?text=${type}+Art'" alt="${item.title}">
+            <h3>${item.title}</h3>
+        `;
+                grid.appendChild(card);
+            });
+        }
+
+        loadImages("color");
+        document.querySelectorAll(".type-btn").forEach(btn => {
+            btn.addEventListener("click", function () {
+                document.querySelectorAll(".type-btn").forEach(b => b.classList.remove("active"));
+                this.classList.add("active");
+                loadImages(this.dataset.type);
+            });
+        });
+
+        // =========================
+        // THEME TOGGLE
+        // =========================
+        const themeBtn = document.getElementById('theme-toggle');
+        const themeIcon = themeBtn ? themeBtn.querySelector('i') : null;
+        const body = document.body;
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            body.classList.add('light-theme');
+            updateThemeBtn('light');
+        } else {
+            updateThemeBtn('dark');
+        }
+
+        themeBtn.addEventListener('click', () => {
+            body.classList.toggle('light-theme');
+            const isLight = body.classList.contains('light-theme');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            updateThemeBtn(isLight ? 'light' : 'dark');
+        });
+
+        function updateThemeBtn(mode) {
+            if (!themeIcon) return;
+            if (mode === 'light') {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
+
+        // =========================
+        // PRICE CALCULATION - UPDATED WITH PERSONS
+        // =========================
+        function calculatePrice() {
+            const rates = window.appRates || {
+                basePencil: 259,
+                baseColor: 499,
+                sizeSmall: 0,
+                sizeMedium: 10,
+                sizeLarge: 15,
+                persons1: 0,
+                persons2: 50,
+                persons3: 80
+            };
+
+            // DRAWING TYPE - LOGICAL PRICES
+            const drawingBtn = document.querySelector(
+                '.customization-options .option-group:nth-of-type(1) .option-btn.active'
+            );
+
+            // Updated logical prices
+            let basePrice = rates.basePencil; // Pencil drawing base price
+            if (drawingBtn && drawingBtn.textContent.includes('Color')) {
+                basePrice = rates.baseColor; // Color drawing base price
+            }
+
+            // SIZE
+            const sizeBtn = document.querySelector(
+                '.customization-options .option-group:nth-of-type(2) .option-btn.active'
+            );
+            let sizePrice = sizeBtn ? parseInt(sizeBtn.dataset.price || 0) : 0;
+            if (sizeBtn && sizeBtn.textContent.includes('Small')) sizePrice = rates.sizeSmall;
+            if (sizeBtn && sizeBtn.textContent.includes('Medium')) sizePrice = rates.sizeMedium;
+            if (sizeBtn && sizeBtn.textContent.includes('Large')) sizePrice = rates.sizeLarge;
+
+            // PERSONS (NEW)
+            const personsBtn = document.querySelector(
+                '.customization-options .option-group:nth-of-type(3) .option-btn.active'
+            );
+            let personsPrice = 0;
+            if (personsBtn && personsBtn.dataset.price !== 'custom') {
+                personsPrice = parseInt(personsBtn.dataset.price || 0);
+            }
+            if (personsBtn && personsBtn.dataset.persons === '1') personsPrice = rates.persons1;
+            if (personsBtn && personsBtn.dataset.persons === '2') personsPrice = rates.persons2;
+            if (personsBtn && personsBtn.dataset.persons === '3') personsPrice = rates.persons3;
+
+            // SHIPPING (updated to reasonable value)
+            const shipping = 0;
+
+            const subtotal = basePrice + sizePrice + personsPrice + shipping;
+
+            // DISCOUNT
+            let discount = 0;
+            if (appliedCoupon) {
+                if (appliedCoupon.type === 'percent') {
+                    discount = Math.round(subtotal * appliedCoupon.value / 100);
+                } else if (appliedCoupon.type === 'flat') {
+                    discount = appliedCoupon.value;
+                }
+            }
+
+            const total = Math.max(subtotal - discount, 0);
+
+            return {
+                base: basePrice,
+                size: sizePrice,
+                persons: personsPrice,
+                shipping: shipping,
+                discount: discount,
+                total: total
+            };
+        }
+
+        // =========================
+        // UPDATE PRICE UI - UPDATED
+        // =========================
+        function updatePriceUI() {
+            const p = calculatePrice();
+            const summary = document.querySelector('.price-summary');
+            if (!summary) return;
+
+            const items = summary.querySelectorAll('.price-item span:last-child');
+            if (items.length >= 5) {
+                items[0].textContent = `₹${p.base}`;
+                items[1].textContent = `₹${p.size}`;
+                items[2].textContent = `₹${p.persons}`;
+                items[3].textContent = `₹${p.shipping}`;
+                items[4].textContent = `-₹${p.discount}`;
+            }
+
+            summary.querySelector('.price-total span:last-child').textContent = `₹${p.total}`;
+        }
+
+        window.updatePriceUIGlobally = updatePriceUI;
+
+        // =========================
+        // OPTION BUTTONS HANDLER (UPDATED FOR ALL OPTION GROUPS)
+        // =========================
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const group = this.closest('.option-buttons');
+                group.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                updatePriceUI();
+            });
+        });
+
+        // =========================
+        // COUPON APPLICATION
+        // =========================
+        document.getElementById('applyCouponBtn')?.addEventListener('click', () => {
+            const input = document.getElementById('couponInput');
+            const msg = document.getElementById('couponMsg');
+
+            const code = input.value.trim().toUpperCase();
+
+            if (coupons[code]) {
+                appliedCoupon = coupons[code];
+                msg.textContent = `✓ Coupon "${code}" applied successfully!`;
+                msg.className = 'coupon-success';
+            } else {
+                appliedCoupon = null;
+                msg.textContent = '✗ Invalid coupon code. Try NEW10 or FLAT50';
+                msg.className = 'coupon-error';
+            }
+
+            updatePriceUI();
+        });
+
+        // =========================
+        // GET ORDER DETAILS - UPDATED WITH PERSONS
+        // =========================
+        function getOrderDetails() {
+            const p = calculatePrice();
+
+            const getActiveBtnText = (groupIndex) => {
+                const el = document.querySelector(`.customization-options .option-group:nth-of-type(${groupIndex}) .option-btn.active`);
+                return el ? el.textContent.trim() : 'N/A';
+            };
+
+            const getPersonsCount = () => {
+                const personsBtn = document.querySelector('.customization-options .option-group:nth-of-type(3) .option-btn.active');
+                if (!personsBtn) return '1 Person';
+
+                if (personsBtn.dataset.persons === 'custom') {
+                    return 'Custom (Contact for quote)';
+                }
+                return personsBtn.textContent.split('<')[0].trim();
+            };
+
+            return {
+                name: document.getElementById('customer-name').value,
+                email: document.getElementById('customer-email').value,
+                phone: document.getElementById('customer-phone').value,
+                address: document.getElementById('customer-address').value,
+                instructions: document.getElementById('instructions').value,
+                style: getActiveBtnText(1),
+                size: getActiveBtnText(2),
+                persons: getPersonsCount(),
+                price: p
+            };
+        }
+
+        // =========================
+        // WHATSAPP FUNCTION - UPDATED WITH PERSONS
+        // =========================
+        function sendOrderViaWhatsApp() {
+            const d = getOrderDetails();
+            const message = `🎨 *NEW CUSTOM ORDER* 🎨%0A%0A` +
+                `*Name:* ${d.name}%0A` +
+                `*Email:* ${d.email}%0A` +
+                `*Phone:* ${d.phone}%0A` +
+                `*Address:* ${d.address}%0A%0A` +
+                `*ORDER DETAILS:*%0A` +
+                `Style: ${d.style}%0A` +
+                `Size: ${d.size}%0A` +
+                `Persons: ${d.persons}%0A` +
+                `Instructions: ${d.instructions || 'None'}%0A%0A` +
+                `*PRICE BREAKDOWN:*%0A` +
+                `Base: ₹${d.price.base}%0A` +
+                `Size: ₹${d.price.size}%0A` +
+                `Persons: ₹${d.price.persons}%0A` +
+                `Shipping: ₹${d.price.shipping}%0A` +
+                `Discount: -₹${d.price.discount}%0A` +
+                `*TOTAL: ₹${d.price.total}*`;
+
+            const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+            window.open(url, '_blank');
+        }
+
+        // =========================
+        // EMAIL FUNCTION - UPDATED WITH PERSONS
+        // =========================
+        async function sendOrderViaEmail(orderId) {
+            const d = getOrderDetails();
+
+            const now = new Date();
+            const orderDate = now.toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            // orderId passed in from the submit handler — same ID saved to Firebase
+
+            const templateParams = {
+                customer_name: d.name || 'Customer',
+                customer_email: d.email || 'No email',
+                customer_phone: d.phone || 'No phone',
+                customer_address: d.address || 'No address',
+                drawing_type: d.style || 'Color Drawing',
+                size: d.size || 'Medium (A4)',
+                number_of_persons: d.persons || '1 Person',
+                instructions: d.instructions || 'No special instructions',
+                base_price: d.price.base || 529,
+                size_price: d.price.size || 10,
+                persons_price: d.price.persons || 0,
+                shipping_price: d.price.shipping || 0,
+                discount: d.price.discount || 0,
+                total_price: d.price.total,
+                order_date: orderDate,
+                order_id: orderId,
+                business_email_to: BUSINESS_EMAIL,
+                customer_email_to: d.email || 'No email'
+            };
+
+            console.log("📧 Sending email with:", templateParams);
+
+            try {
+                const response = await emailjs.send(
+                    EMAIL_CONFIG.serviceId,
+                    EMAIL_CONFIG.templateId,
+                    templateParams
+                );
+                console.log("✅ Email sent successfully!");
+                return response;
+            } catch (error) {
+                console.error("❌ EmailJS Error:", error);
+                throw error;
+            }
+        }
+
+        // =========================
+        // FORM SUBMISSION
+        // =========================
+        const uploadForm = document.getElementById('upload-form');
+        const spinner = document.getElementById('loading-spinner');
+        const statusDiv = document.getElementById('email-status-container');
+        const submitBtn = document.getElementById('submit-btn');
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                // Validation
+                const name = document.getElementById('customer-name').value.trim();
+                const email = document.getElementById('customer-email').value.trim();
+                const phone = document.getElementById('customer-phone').value.trim();
+
+                if (!name || !email || !phone) {
+                    alert("Please fill in all required fields: Name, Email, and Phone");
+                    return;
+                }
+
+                // Check if custom persons is selected without instructions
+                const personsBtn = document.querySelector('.customization-options .option-group:nth-of-type(3) .option-btn.active');
+                const instructions = document.getElementById('instructions').value.trim();
+                if (personsBtn && personsBtn.dataset.persons === 'custom' && !instructions) {
+                    alert("Please mention the number of persons and details in the 'Special Instructions' box for custom person count.");
+                    return;
+                }
+
+                const emailChecked = document.getElementById('send-email').checked;
+
+                // --- START LOADING ANIMATION ---
+                spinner.classList.remove('hidden'); // Shows the circle spinner
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Processing...';
+                statusDiv.style.display = 'none';
+
+                try {
+                    // ── Generate ONE Order ID for both Firebase and Email ─────
+                    const orderId = 'MA' + Date.now().toString().slice(-6);
+
+                    // ── STEP 1: Save to Firebase (with 6s timeout guard) ───────
+                    try {
+                        const db = window._orderDB;
+                        const addDoc = window._orderAddDoc;
+                        const collection = window._orderCollection;
+                        const serverTS = window._orderServerTS;
+                        if (db && addDoc && collection && !window._firebaseBlocked) {
+                            const d = getOrderDetails();
+
+                            // Race Firebase write against 6s timeout — prevents hanging if Firestore is unreachable
+                            const fbWrite = addDoc(collection(db, 'orders'), {
+                                orderId,
+                                name: d.name,
+                                email: d.email,
+                                phone: d.phone,
+                                address: d.address,
+                                instructions: d.instructions,
+                                drawingStyle: d.style,
+                                size: d.size,
+                                persons: d.persons,
+                                basePrice: d.price.base,
+                                sizePrice: d.price.size,
+                                personsPrice: d.price.persons,
+                                discount: d.price.discount,
+                                totalPrice: d.price.total,
+                                referenceImage: orderImageBase64 || null,
+                                status: 'Order Received',
+                                timestamp: serverTS()
+                            });
+                            const timeout = new Promise((_, reject) =>
+                                setTimeout(() => reject(new Error('Firebase timeout')), 6000)
+                            );
+                            await Promise.race([fbWrite, timeout]);
+                            console.log('✅ Order saved to Firestore:', orderId);
+                        } else if (window._firebaseBlocked) {
+                            console.warn('⚠️ Firebase skipped: file:// protocol detected.');
+                        }
+                    } catch (fbErr) {
+                        if (fbErr.message === 'Firebase timeout') {
+                            console.warn('⚠️ Firestore unreachable (timeout). Order will continue via Email only.');
+                        } else {
+                            console.error('⚠️ Firestore save failed:', fbErr);
+                        }
+                    }
+
+                    // ── STEP 2: Send Email via EmailJS ───────────────────────
+                    // Wrapped in its own try-catch so an EmailJS error never blocks the success popup
+                    if (emailChecked) {
+                        statusDiv.innerHTML = '<div class="email-status email-pending"><i class="fas fa-spinner fa-spin"></i> Sending order confirmation...</div>';
+                        statusDiv.style.display = "block";
+                        try {
+                            await sendOrderViaEmail(orderId);
+                            statusDiv.innerHTML = '<div class="email-status email-success"><i class="fas fa-check"></i> Order confirmation email sent!</div>';
+                        } catch (emailErr) {
+                            // Email may still have been delivered — just log and continue
+                            console.warn('⚠️ EmailJS reported an error (email may still have been delivered):', emailErr);
+                            statusDiv.innerHTML = '<div class="email-status email-pending"><i class="fas fa-info-circle"></i> Order placed! Check your inbox for confirmation.</div>';
+                        }
+                    }
+
+                    // ── STEP 3: Show popup & reset — always runs ──────────────
+                    const d = getOrderDetails();
+                    const now = new Date();
+                    showOrderCompleted({
+                        orderId: orderId,
+                        name: d.name,
+                        email: d.email,
+                        phone: d.phone,
+                        address: d.address,
+                        style: d.style,
+                        size: d.size,
+                        persons: d.persons,
+                        instructions: d.instructions,
+                        date: now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    });
+                    uploadForm.reset();
+                    ouRemoveBtn.click();
+
+                    // Reset option buttons to defaults
+                    document.querySelectorAll('.option-btn').forEach(btn => {
+                        if (btn.textContent.includes('Color') && btn.closest('.option-group').querySelector('h3').textContent.includes('Drawing Type')) {
+                            btn.classList.add('active');
+                        } else if (btn.textContent.includes('Medium') && btn.closest('.option-group').querySelector('h3').textContent.includes('Size')) {
+                            btn.classList.add('active');
+                        } else if (btn.dataset.persons === '1' && btn.closest('.option-group').querySelector('h3').textContent.includes('Persons')) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+
+                    updatePriceUI();
+
+                    appliedCoupon = null;
+                    document.getElementById('couponInput').value = '';
+                    document.getElementById('couponMsg').textContent = '';
+
+                } catch (err) {
+                    // Silently log — no message shown to customer
+                    console.error("Order submission error:", err);
+
+                } finally {
+                    // --- STOP LOADING ANIMATION ---
+                    spinner.classList.add('hidden'); // Hides the circle spinner
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-palette"></i> Place Order';
+                }
+            });
+        }
+
+        // =========================
+        // MOBILE MENU
+        // =========================
+        const hamburger = document.querySelector('.hamburger');
+        const navMenu = document.querySelector('.nav-menu');
+        const overlay = document.createElement('div');
+        overlay.id = 'mobile-menu-overlay';
+        document.body.appendChild(overlay);
+
+        function toggleMenu() {
+            navMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+            const icon = hamburger.querySelector('i');
+            if (navMenu.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        }
+
+        if (hamburger) {
+            hamburger.addEventListener('click', toggleMenu);
+            overlay.addEventListener('click', toggleMenu);
+            document.querySelectorAll('.nav-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 768) toggleMenu();
+                });
+            });
+        }
+
+        // Initial price update
+        updatePriceUI();
+
+        // =========================
+        // PERSONS SELECTION VALIDATION
+        // =========================
+        function validatePersonsSelection() {
+            const personsBtn = document.querySelector('.customization-options .option-group:nth-of-type(3) .option-btn.active');
+            if (personsBtn && personsBtn.dataset.persons === 'custom') {
+                const instructions = document.getElementById('instructions').value.trim();
+                if (!instructions) {
+                    alert("For custom number of persons, please mention details in the 'Special Instructions' box.");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // =========================
+        // ORDER STATUS LOOKUP
+        // =========================
+        const STATUS_CONFIG = {
+            'Order Received': { cls: 'os-status-received', icon: 'fa-inbox', step: 0 },
+            'Processing': { cls: 'os-status-progress', icon: 'fa-paint-brush', step: 1 },
+            'In Progress': { cls: 'os-status-progress', icon: 'fa-palette', step: 2 },
+            'Completed': { cls: 'os-status-completed', icon: 'fa-check-circle', step: 3 },
+            'Shipped': { cls: 'os-status-shipped', icon: 'fa-shipping-fast', step: 4 },
+            'Delivered': { cls: 'os-status-delivered', icon: 'fa-home', step: 5 }
+        };
+        const STATUS_STEPS = ['Order Received', 'Processing', 'In Progress', 'Completed', 'Shipped', 'Delivered'];
+        const STEP_ICONS = ['fa-inbox', 'fa-paint-brush', 'fa-palette', 'fa-check-circle', 'fa-shipping-fast', 'fa-home'];
+
+        async function checkOrderStatus() {
+            const raw = (document.getElementById('os-input').value || '').trim().toUpperCase();
+            const res = document.getElementById('os-result');
+
+            if (!raw) {
+                res.style.display = 'block';
+                res.innerHTML = `<div class="os-not-found"><i class="fas fa-exclamation-circle"></i><p>Please enter an Order ID.</p></div>`;
+                return;
+            }
+
+            res.style.display = 'block';
+            res.innerHTML = `<div style="text-align:center;padding:20px;"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;color:var(--accent);"></i><p style="margin-top:10px;color:var(--gray-text);">Searching...</p></div>`;
+
+            try {
+                const db = window._orderDB;
+                const getDocs = window._orderGetDocs;
+                const q = window._orderQuery;
+                const where = window._orderWhere;
+                const collection = window._orderCollection;
+
+                if (!db || !getDocs) {
+                    res.innerHTML = `<div class="os-not-found"><i class="fas fa-wifi"></i><p>Firebase not ready. Please refresh and try again.</p></div>`;
+                    return;
+                }
+
+                const snap = await getDocs(q(collection(db, 'orders'), where('orderId', '==', raw)));
+
+                if (snap.empty) {
+                    res.innerHTML = `
+                        <div class="os-not-found">
+                            <i class="fas fa-search"></i>
+                            <p>No order found with ID <strong>${raw}</strong>.</p>
+                            <p style="font-size:0.82rem;">Please check your Order ID and try again.</p>
+                        </div>`;
+                    return;
+                }
+
+                const order = snap.docs[0].data();
+                const status = order.status || 'Order Received';
+                const cfg = STATUS_CONFIG[status] || STATUS_CONFIG['Order Received'];
+                const stepIdx = cfg.step;
+
+                // Format date
+                let dateStr = '—';
+                if (order.timestamp?.seconds) {
+                    dateStr = new Date(order.timestamp.seconds * 1000).toLocaleString('en-IN', {
+                        day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                    });
+                }
+
+                // Build progress bar
+                let progressHtml = '<div class="os-progress">';
+                STATUS_STEPS.forEach((s, i) => {
+                    const cls = i < stepIdx ? 'done' : (i === stepIdx ? 'active' : '');
+                    progressHtml += `
+                        <div class="os-step ${cls}">
+                            <div class="os-step-circle"><i class="fas ${STEP_ICONS[i]}"></i></div>
+                            <span class="os-step-lbl">${s.replace(' ', '​ ')}</span>
+                        </div>`;
+                    if (i < STATUS_STEPS.length - 1) {
+                        progressHtml += `<div class="os-connector ${i < stepIdx ? 'done' : ''}"></div>`;
+                    }
+                });
+                progressHtml += '</div>';
+
+                res.innerHTML = `
+                    <div class="os-order-detail">
+                        <div class="os-order-header">
+                            <span class="os-order-id"><i class="fas fa-receipt"></i> ${raw}</span>
+                            <span class="os-status-badge ${cfg.cls}"><i class="fas ${cfg.icon}"></i> ${status}</span>
+                        </div>
+                        <div class="os-order-body">
+                            ${progressHtml}
+                            <div class="os-detail-row"><span>Customer</span><span>${order.name || '—'}</span></div>
+                            <div class="os-detail-row"><span>Drawing Style</span><span>${order.drawingStyle || '—'}</span></div>
+                            <div class="os-detail-row"><span>Size</span><span>${order.size || '—'}</span></div>
+                            <div class="os-detail-row"><span>Persons</span><span>${order.persons || '—'}</span></div>
+                            <div class="os-detail-row"><span>Order Date</span><span>${dateStr}</span></div>
+                        </div>
+                    </div>
+                    <p style="font-size:0.8rem;color:var(--gray-text);text-align:center;margin-top:10px;">
+                        <i class="fas fa-headset"></i> Questions? 
+                        <a href="contact.html" style="color:var(--accent);">Contact us</a>
+                    </p>`;
+
+            } catch (err) {
+                console.error(err);
+                res.innerHTML = `<div class="os-not-found"><i class="fas fa-exclamation-triangle"></i><p>Error fetching order. Please try again.</p></div>`;
+            }
+        }
+
+        // Allow pressing Enter in the Order ID field
+        document.getElementById('os-input')?.addEventListener('keydown', e => {
+            if (e.key === 'Enter') checkOrderStatus();
+        });
+    </script>
+
+</body>
+
+</html>
